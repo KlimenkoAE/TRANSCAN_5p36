@@ -1,1 +1,315 @@
 #pragma once
+#include "fifo_ring.hpp"
+#include "serial_print.hpp"
+
+//////////////////////////////////////////////////////
+extern "C"{
+#include <stdbool.h>
+#include <stdint.h>
+#include<string.h>
+#include "sysctl.h"
+#include "usb.h"
+#include "timer.h"
+#include "hw_usb.h"
+#define TARGET_IS_TEMPEST_RC1
+#include "rom.h"
+#include "rom_map.h"
+#include "USB_THIS_PROGRAM_DEFS.hpp"
+}
+
+typedef enum
+{
+    CDC_SS_NONE        = 0x00, // ничего не активно
+    CDC_SS_DCD         = 0x01, // Data Carrier Detect
+    CDC_SS_DSR         = 0x02, // Data Set Ready
+    CDC_SS_DCD_DSR     = 0x03, // DCD + DSR  (часто “порт жив”)
+    CDC_SS_BREAK       = 0x04, // Break
+    CDC_SS_RING        = 0x08, // Ring signal
+    CDC_SS_FRAME_ERR   = 0x10, // Framing error
+    CDC_SS_PARITY_ERR  = 0x20, // Parity error
+    CDC_SS_OVERRUN     = 0x40  // Overrun error
+} CDC_SerialState_t;
+ union CDC_Flags{
+  struct {
+  bool COMMUNICATION_INT:1;
+  bool DATA_IN_INT:1;
+  bool DATA_OUT_INT:1;
+  bool COMMUNICATION_BUSY:1;
+  bool DATA_IN_BUSY:1;
+  bool DATA_OUT_BUSY:1;
+  bool HOST_LINE_STATE_CHANGED:1;
+  bool PRIORITY_PENDING:1;
+  bool DEV_LINE_STATE_CHANGED:1;
+  bool DATA_IN_ON:1;
+  bool f11:1;
+  bool f12:1;
+  bool f13:1;
+  bool f14:1;
+  bool f15:1;
+  };
+  uint16_t all;
+};
+struct _ImmediaetyTransferState{
+    uint8_t* pr_buf;
+    uint32_t pr_len;
+    uint32_t pr_pos;
+};
+
+typedef struct
+{
+    uint32_t dwDTERate;      // Baudrate
+    uint8_t  bCharFormat;    // Stop bits
+    uint8_t  bParityType;    // Parity
+    uint8_t  bDataBits;      // Data bits
+} CDC_LineCoding_t;
+
+template
+<
+ uint16_t tx_fr_size
+,uint16_t rx_fr_size
+
+,uint32_t USB_BASE
+
+,uint32_t DATA_IN_EP
+,uint32_t DATA_IN_EP_SZ
+,uint32_t DATA_IN_INT
+
+,uint32_t DATA_OUT_EP
+,uint32_t DATA_OUT_EP_SZ
+,uint32_t DATA_OUT_INT
+
+,uint32_t COMMUNICATION_EP
+,uint32_t CDC0_COMMUNICFTION_EP_SZ
+,uint32_t COMMUNICATION_INT    
+>
+
+class CDC{
+  FIFO_Ring<tx_fr_size> fr_RX; 
+  FIFO_Ring<rx_fr_size> fr_TX;
+  CDC_LineCoding_t IineCoding;
+  Serial_Print Print;
+
+  CDC_SerialState_t Host_Curr_State;
+  CDC_SerialState_t Dev_Curr_State;
+  CDC_Flags Flags;
+  _ImmediaetyTransferState ImmediaetyTransferState;
+  uint16_t ControlState;
+  bool& TIMER_TX_INT_FLAG;
+  bool& TIMER_COMMUNICATION_INT_FLAG;
+public:
+    CDC(bool& timer_tx_f,bool& timer_comm_f)
+        : Print([this](uint8_t b){ fr_TX.add_byte(b); })
+        ,TIMER_TX_INT_FLAG(timer_tx_f)
+        ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
+    {}
+
+///////
+void Send_Device_State(CDC_SerialState_t b8)
+{
+
+    static uint8_t notify[10] = {
+        0xA1, 0x20,
+        0x00, 0x00,
+        0x00, 0x00,       // interface 0
+        0x02, 0x00,
+        0x02, 0x00        // DSR = 1
+    };
+    notify[8] = b8;       // DCD/DSR/Break/errors
+    notify[9] = 0x00;
+if(MAP_USBEndpointDataPut(USB_BASE, COMMUNICATION_EP, notify, 10)!=0)return;
+    MAP_USBEndpointDataSend(USB_BASE, COMMUNICATION_EP, USB_TRANS_IN);
+}
+
+
+void TX_Immediacy( uint8_t* buf, uint32_t sz) {
+    if(!Flags.DATA_IN_BUSY/*&&CDC_Host_Curr_State==CDC_SS_DCD_DSR*/) {
+        // сразу отправляем первый кусок
+        uint32_t chunk = (sz > DATA_IN_EP_SZ) ? DATA_IN_EP_SZ : sz;
+        MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP, buf, chunk);
+        MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+        Flags.DATA_IN_BUSY = true;
+
+        // если буфер длиннее — запомним остаток
+        if(sz > chunk) {
+            Flags.PRIORITY_PENDING = true;
+            ImmediaetyTransferState.pr_buf = buf;
+            ImmediaetyTransferState.pr_len = sz;
+            ImmediaetyTransferState.pr_pos = chunk;
+        }
+    } else {
+        // endpoint занят → отложим весь буфер
+        Flags.PRIORITY_PENDING = true;
+        ImmediaetyTransferState.pr_buf = buf;
+        ImmediaetyTransferState.pr_len = sz;
+        ImmediaetyTransferState.pr_pos = 0;
+    }
+}
+// Передача из кольцевого буфера FIFO
+void TX() {
+if(fr_TX->Count()==0)return;
+uint16_t cnt_for_tx=0;
+// Если endpoint занят — выходим, чтобы не потерять приоритетные данные
+
+    if(Host_Curr_State!=CDC_SS_DCD_DSR){
+      Dev_Change_Status(CDC_SS_DCD_DSR);//это отправит 0x03 и по идее изменится CDC_Host_Curr_State
+     // SysCtlDelay(DELAY_LOAD_1us*100);
+    }
+    if (Flags.DATA_IN_BUSY||!Flags.DATA_IN_ON) {
+        return;
+    }
+    // Пока есть полный пакет
+    while(fr_TX->Count() >= DATA_IN_EP_SZ) {
+        uint8_t pkt[DATA_IN_EP_SZ];
+
+        cnt_for_tx =fr_TX->read_range(pkt, DATA_IN_EP_SZ);   // вытащить из кольца
+        TX_Immediacy(pkt, cnt_for_tx);
+    }
+
+    // Остаток < CDC0_TX_SZ
+    if(fr_TX->Count() > 0) {
+        uint8_t pkt[DATA_IN_EP_SZ];
+        cnt_for_tx = fr_TX->read_range (pkt, fr_TX->Count());
+        TX_Immediacy(pkt, cnt_for_tx);
+    }
+    else if(cnt_for_tx%DATA_IN_EP_SZ==0){
+     MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP, NULL, 0);
+      MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+      Flags.DATA_IN_BUSY = true;
+    }
+}
+// Вспомогательная inline-функция: отправка следующего куска приоритетного буфера
+ void SendPriorityChunk(void){
+    if(Flags.PRIORITY_PENDING) {
+        if(ImmediaetyTransferState.pr_pos < ImmediaetyTransferState.pr_len) {
+            uint32_t remaining = ImmediaetyTransferState.pr_len - ImmediaetyTransferState.pr_pos;
+            uint32_t chunk = (remaining > DATA_IN_EP_SZ) ? DATA_IN_EP_SZ : remaining;
+
+            MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP,
+                                   ImmediaetyTransferState.pr_buf + ImmediaetyTransferState.pr_pos,
+                                   chunk);
+            MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+            Flags.DATA_IN_BUSY = true;
+            ImmediaetyTransferState.pr_pos += chunk;
+        } else {
+            // весь буфер ушёл
+            Flags.PRIORITY_PENDING = false;
+        }
+    }
+}
+
+void TX_InterrupHandler(){
+    uint32_t st  = USBEndpointStatus(USB_BASE, DATA_IN_EP);
+    MAP_USBDevEndpointStatusClear(USB_BASE, DATA_IN_EP, st);
+    
+
+    Flags.DATA_IN_INT = true;   // бросаем флаг "было прерывание"
+    Flags.DATA_IN_BUSY = false; // освобождаем endpoint
+
+    SendPriorityChunk();        // проверяем и отправляем срочный кусок
+}
+
+void RX_InterrupHandler(){
+   uint32_t st =USBEndpointStatus(USB_BASE, DATA_OUT_EP);
+   MAP_USBDevEndpointStatusClear(USB_BASE, DATA_OUT_EP, st);
+       unsigned long len = MAP_USBEndpointDataAvail(USB_BASE, DATA_OUT_EP);
+        if (len > 0)
+        {
+    
+            uint8_t rx_buf[DATA_OUT_EP_SZ];        
+            MAP_USBEndpointDataGet(USB_BASE, DATA_OUT_EP, rx_buf, &len);
+            // Здесь извлекаю из фифо в fr_CDC_RX
+            fr_RX.write_range(rx_buf,len);                 
+        }
+    // Обязательно разрешаем следующий приём
+     MAP_USBDevEndpointDataAck(USB_BASE, DATA_OUT_EP, false);
+     Flags.DATA_OUT_INT=true;
+
+}
+
+void Communication_InterrupHandler(){
+    uint32_t st=USBEndpointStatus(USB_BASE, COMMUNICATION_EP);
+    MAP_USBDevEndpointStatusClear(USB_BASE, COMMUNICATION_EP, st);
+    Flags.COMMUNICATION_BUSY = false;
+    Flags.COMMUNICATION_INT=true;
+    }
+
+void TraceHostStatus(uint16_t lineStatus){//это из прерывания 2122 USB_CDC_SET_CONTROL_LINE_STATE
+  Host_Curr_State=(CDC_SerialState_t)(lineStatus&0x0003);//в TX/RX проверять состояние (CDC_Curr_State)
+  Flags.all=0;
+  Flags.HOST_LINE_STATE_CHANGED=true;
+}
+
+void CangeHostLineState_Handler(){
+    if(!Flags.HOST_LINE_STATE_CHANGED) return;
+
+    // здесь решаем, какое DEV состояние выставить
+    if(Host_Curr_State & 0x01) { // DTR=1 → порт открыт
+        Dev_Change_Status(CDC_SS_DCD_DSR);
+    } else {
+        Dev_Change_Status(CDC_SS_DCD); // только присутствие
+    }
+    Flags.HOST_LINE_STATE_CHANGED = false;
+}
+
+
+void Dev_Change_Status(CDC_SerialState_t status){
+if(status==Dev_Curr_State)return;
+Dev_Curr_State=status;
+DevStatusAnswer(true);
+  switch (status) {
+    case CDC_SS_NONE:
+    break;
+    case CDC_SS_DCD:
+    break;
+    case CDC_SS_DSR:
+    break;
+    case CDC_SS_DCD_DSR:
+    Flags.DATA_IN_ON=true;
+    break;
+    case CDC_SS_OVERRUN:
+    break;
+    case CDC_SS_RING:
+    break;
+    case CDC_SS_PARITY_ERR:
+    break;
+    case CDC_SS_FRAME_ERR:
+    break;
+    case CDC_SS_BREAK:
+    break;
+    default:
+    return;
+  }
+}
+void DevStatusAnswer(bool wait){//это из главного цикла
+static const uint32_t delay_load = DELAY_LOAD_1us*150;
+    Send_Device_State(Dev_Curr_State);
+    if(!Flags.COMMUNICATION_BUSY){
+      Send_Device_State(Dev_Curr_State);
+    Flags.COMMUNICATION_BUSY=true;
+    }
+  else if(wait)
+   SysCtlDelay (delay_load);
+    if(!Flags.COMMUNICATION_BUSY){
+    Flags.COMMUNICATION_BUSY=true;
+    Send_Device_State(Dev_Curr_State);
+    }
+}
+void Process_TX_Timer()
+{
+if(!TIMER_TX_INT_FLAG)return;
+TX();
+TIMER_TX_INT_FLAG=false;
+}
+
+void Communication_Send(){
+if(!TIMER_COMMUNICATION_INT_FLAG)return;
+      if(!Flags.COMMUNICATION_BUSY)
+      {
+      DevStatusAnswer(false);
+      }
+  TIMER_COMMUNICATION_INT_FLAG=false;
+  Flags.COMMUNICATION_BUSY=true;
+  }
+};
+
+

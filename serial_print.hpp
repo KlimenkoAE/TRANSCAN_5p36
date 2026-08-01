@@ -4,11 +4,10 @@
 
 #ifdef __cplusplus extern "C"{
 #endif
-
 #define DEPRECATED
-#include "../StellarisWare/inc/hw_types.h"
+#include "hw_types.h"
 #include "sysctl.h"
-#include "../StellarisWare/inc/hw_sysctl.h"
+#include "hw_sysctl.h"
 #include "uart.h"
 #include <stdlib.h>
 #include <functional>

@@ -1,8 +1,9 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks>
-  <BookmarkItem objectName="" line="146" column="0" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="3" extra="" color="5"/>
+  <BookmarkItem objectName="" line="217" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_CDC.hpp" number="1" extra="uint8_t rx_buf[DATA_OUT_EP_SZ];" color="5"/>
   <BookmarkItem objectName="" line="42" column="0" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="1" extra="MAP_USBDevEndpointConfigSet(USB0_BASE, USB_EP_1,1023,USB_EP_MODE_ISOC|USB_EP_DEV_IN|/*USB_EP_AUTO_SET|USB_EP_AUTO_CLEAR|DISABLE_NAK_LIMIT|*/USB_EP_DMA_MODE_0);" color="5"/>
+  <BookmarkItem objectName="" line="146" column="0" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="3" extra="" color="5"/>
   <BookmarkItem objectName="" line="329" column="18" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="2" extra="uart_print_d(&quot;SETUP ROUTINE COMMAND NO HANDLE, STALL/n&quot;);" color="5"/>
  </Bookmarks>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
@@ -70,12 +71,12 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="16" y="13" useTextEdit="1" path="main.cpp" left="0" selected="1" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="2" y="3" useTextEdit="1" path="_CDC.cpp" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1" useTextEdit="1" path="_CDC.hpp" left="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="3" y="34" useTextEdit="1" path="fifo_ring.hpp" left="0" top="6" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="19" y="57" useTextEdit="1" path="serial_print.hpp" left="0" top="36" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="5" y="253" useTextEdit="1" path="../StellarisWare/driverlib/uart.h" left="0" top="235" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="14" y="2" useTextEdit="1" path="main.cpp" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="253" useTextEdit="1" folds0="210,241,254,258" path="_CDC.hpp" left="0" top="209" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="6" useTextEdit="1" path="fifo_ring.hpp" left="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="18" y="7" useTextEdit="1" path="serial_print.hpp" left="0" top="9" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="23" y="28" useTextEdit="1" path="USB_THIS_PROGRAM_DEFS.hpp" left="0" top="7" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="6" y="19" useTextEdit="1" path="_TIMERS.hpp" left="0" selected="1" top="12" codecName="Default"/>
  </Files>
  <EMStudioWindow activeProject="TRANSCAN_5p36" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

@@ -18,10 +18,8 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/serial_print.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/../StellarisWare/inc/hw_types.h \
-  ../StellarisWare/driverlib/sysctl.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/../StellarisWare/inc/hw_sysctl.h \
-  ../StellarisWare/driverlib/uart.h \
+  ../StellarisWare/inc/hw_types.h ../StellarisWare/driverlib/sysctl.h \
+  ../StellarisWare/inc/hw_sysctl.h ../StellarisWare/driverlib/uart.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdlib.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdlib.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/functional \
@@ -456,5 +454,9 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/perfect_forward.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_back.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_front.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/../StellarisWare/inc/hw_memmap.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/../StellarisWare/inc/hw_uart.h
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_CDC.hpp \
+  ../StellarisWare/driverlib/usb.h ../StellarisWare/driverlib/timer.h \
+  ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
+  ../StellarisWare/driverlib/rom_map.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  ../StellarisWare/inc/hw_memmap.h ../StellarisWare/inc/hw_uart.h

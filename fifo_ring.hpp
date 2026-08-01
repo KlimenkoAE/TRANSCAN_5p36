@@ -1,10 +1,10 @@
 #pragma once
-#ifdef __cplusplus extern "C"{
-#endif
+ extern "C"{
+
 #include <stdint.h>
 #include <stdbool.h>
-#ifdef __cplusplus }
-#endif
+ }
+
 
 template<uint32_t sz>
 class FIFO_Ring{

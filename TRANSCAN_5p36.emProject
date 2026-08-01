@@ -47,7 +47,7 @@
       arm_linker_stack_size="2048"
       arm_linker_variant="SEGGER"
       arm_target_device_name="LM3S5P36"
-      c_user_include_directories=".;../StellarisWare/driverlib/;../SrellarisWare/inc/"
+      c_user_include_directories=".;../StellarisWare/inc/;../StellarisWare/driverlib/"
       debug_stack_pointer_start="__stack_end__"
       debug_target_connection="J-Link"
       gcc_entry_point="Reset_Handler"
@@ -68,10 +68,10 @@
       <file file_name="_CDC.hpp" />
       <file file_name="fifo_ring.hpp" />
       <file file_name="serial_print.hpp" />
+      <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
     </folder>
     <folder Name="Setup" />
     <folder Name="Source">
-      <file file_name="_CDC.cpp" />
       <file file_name="main.cpp" />
     </folder>
     <folder Name="System">
@@ -79,6 +79,7 @@
       <file file_name="System/Cortex_M_Startup.s" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name="_TIMERS.hpp" />
     <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>
