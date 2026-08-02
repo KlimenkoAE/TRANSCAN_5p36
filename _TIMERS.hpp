@@ -7,13 +7,12 @@ extern "C"{
 #include "rom.h"
 #include "rom_map.h"
 #include"interrupt.h"
-
-
-
 }
 #include <functional>
 #include <algorithm>
-extern "C"{
+#include <cstdarg>
+#include "periferalISR.hpp"
+/*extern "C"{
  void ISR0();
  void ISR1();
  void ISR2();
@@ -34,33 +33,11 @@ public:
 
     static void Registration(uint32_t b, uint32_t t, std::function<void()> isr);
     static void InitTable();  // один раз при старте
-};
-/*static class TimerISR{
+};*/
+class TimerISR:IPeriferalISR{
 public:
-static uint8_t isr_count;
-
-
-static  std::function<void()> lmd[10];
-static void (*ISR[10])();
-
-static void Registration(uint32_t b,uint32_t t, std::function<void()> isr){
-lmd[isr_count]=isr;
-TimerIntRegister(b,t,ISR[isr_count]);
-}
-TimerISR(){
-ISR[0]=ISR0;
-ISR[1]=ISR1;
-ISR[2]=ISR2;
-ISR[3]=ISR3;
-ISR[4]=ISR4;
-ISR[5]=ISR5;
-ISR[6]=ISR6;
-ISR[7]=ISR7;
-ISR[8]=ISR8;
-ISR[9]=ISR9;
-}
+void Registration(std::function<void()> isr, uint32_t sw_def, ...);
 };
-*/
 template<uint32_t timer_base, uint32_t timer_cfg_bit_per,
 uint32_t sysctl_periferal,
 uint32_t timer_letter,
@@ -68,7 +45,7 @@ uint32_t timer_timeout,
 uint32_t period_us,uint32_t... ext_periodes>
 
 class TimerPeriodic_us{
-
+TimerISR TISR;
 class InerStruct{
   public:
   uint32_t period;
@@ -124,9 +101,9 @@ TIMER_IS_INIT=false;
     TimerConfigure(timer_base, timer_cfg_bit_per);
 
     TimerLoadSet(timer_base,timer_letter,main_period.load);
-    TimerISR::Registration(timer_base,timer_letter,[this](){
+    TISR.Registration([this](){
     this->ISR();
-    });
+    },timer_base,timer_letter);
   //  TimerIntRegister(timer_base,timer_letter,Timer_ISR_Wrapper);
     TimerIntClear(timer_base, timer_timeout);
     TimerIntEnable(timer_base, timer_timeout);

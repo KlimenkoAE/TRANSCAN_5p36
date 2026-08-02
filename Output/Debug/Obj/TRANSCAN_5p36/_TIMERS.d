@@ -629,4 +629,7 @@ Output/Debug/Obj/TRANSCAN_5p36/_TIMERS.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_contains_subrange.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_ends_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_starts_with.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalISR.hpp

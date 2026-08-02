@@ -66,26 +66,31 @@
       LIBRARY_IO_TYPE="SEMIHOST (host-formatted)"
       Name="Release_MinSize" />
     <folder Name="Include">
+      <file file_name="_CAN.hpp" />
       <file file_name="_CDC.hpp" />
       <file file_name="_TIMERS.hpp" />
       <file file_name="fifo_ring.hpp" />
+      <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
     </folder>
     <folder Name="Setup" />
     <folder Name="Source">
       <file file_name="_TIMERS.cpp" />
+      <file file_name="_UCB.cpp" />
       <file file_name="main.cpp">
         <configuration
           Name="Common"
           c_user_include_directories=".;../StellarisWare;../StellarisWare/inc" />
       </file>
+      <file file_name="periferalISR.cpp" />
     </folder>
     <folder Name="System">
       <file file_name="$(DeviceVectorsFile:)" />
       <file file_name="System/Cortex_M_Startup.s" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name="_USB.hpp" />
     <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>

@@ -1,7 +1,7 @@
 
 #include "hw_types.h"
 #include "_TIMERS.hpp"
-
+/*
 extern "C" {
 void ISR0() { if (TimerISR::lmd[0]) TimerISR::lmd[0](); }
 void ISR1() { if (TimerISR::lmd[1]) TimerISR::lmd[1](); }
@@ -31,13 +31,38 @@ void TimerISR::InitTable()
 
 void TimerISR::Registration(uint32_t b, uint32_t t, std::function<void()> isr)
 {
-    if (isr_count >= 10)
+    if (isr_count >= 32)
         return; // переполнение
 
     lmd[isr_count] = std::move(isr);
     TimerIntRegister(b, t, ISR[isr_count]);
     ++isr_count;
 }
+
+*/
+
+void TimerISR::Registration(std::function<void()> isr, uint32_t sw_def, ...){
+ va_list args;
+    va_start(args, sw_def);
+
+    // первый параметр
+    uint32_t b = sw_def;
+    // второй параметр
+    uint32_t t = va_arg(args, uint32_t);
+
+    if (isr_count >= 32) {
+        va_end(args);
+        return;
+    }
+
+    lmd[isr_count] = std::move(isr);
+    TimerIntRegister(b, t, ISR[isr_count]);
+    ++isr_count;
+
+    va_end(args);
+}
+
+
 
 
 
