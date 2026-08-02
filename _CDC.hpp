@@ -11,7 +11,7 @@ extern "C"{
 #include "usb.h"
 #include "timer.h"
 #include "hw_usb.h"
-#define TARGET_IS_TEMPEST_RC1
+//#define TARGET_IS_TEMPEST_RC1
 #include "rom.h"
 #include "rom_map.h"
 #include "USB_THIS_PROGRAM_DEFS.hpp"

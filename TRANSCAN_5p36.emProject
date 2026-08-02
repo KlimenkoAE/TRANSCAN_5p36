@@ -50,6 +50,7 @@
       c_user_include_directories=".;../StellarisWare/inc/;../StellarisWare/driverlib/"
       debug_stack_pointer_start="__stack_end__"
       debug_target_connection="J-Link"
+      gcc_cplusplus_language_standard="c++23"
       gcc_entry_point="Reset_Handler"
       link_linker_script_file="Setup/SEGGER_Flash.icf"
       linker_output_format="hex"
@@ -66,20 +67,25 @@
       Name="Release_MinSize" />
     <folder Name="Include">
       <file file_name="_CDC.hpp" />
+      <file file_name="_TIMERS.hpp" />
       <file file_name="fifo_ring.hpp" />
       <file file_name="serial_print.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
     </folder>
     <folder Name="Setup" />
     <folder Name="Source">
-      <file file_name="main.cpp" />
+      <file file_name="_TIMERS.cpp" />
+      <file file_name="main.cpp">
+        <configuration
+          Name="Common"
+          c_user_include_directories=".;../StellarisWare;../StellarisWare/inc" />
+      </file>
     </folder>
     <folder Name="System">
       <file file_name="$(DeviceVectorsFile:)" />
       <file file_name="System/Cortex_M_Startup.s" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
-    <file file_name="_TIMERS.hpp" />
     <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>

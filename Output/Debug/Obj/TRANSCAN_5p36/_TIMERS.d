@@ -1,6 +1,7 @@
-Output/Debug/Obj/TRANSCAN_5p36/main.o: \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/main.cpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/fifo_ring.hpp \
+Output/Debug/Obj/TRANSCAN_5p36/_TIMERS.o: \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.cpp \
+  ../StellarisWare/inc/hw_types.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdint.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config_site \
@@ -16,12 +17,9 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Arm_Conf.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdbool.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/serial_print.hpp \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
-  ../StellarisWare/inc/hw_types.h ../StellarisWare/driverlib/sysctl.h \
-  ../StellarisWare/inc/hw_sysctl.h ../StellarisWare/driverlib/uart.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdlib.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdlib.h \
+  ../StellarisWare/driverlib/timer.h ../StellarisWare/driverlib/sysctl.h \
+  ../StellarisWare/driverlib/rom.h ../StellarisWare/driverlib/rom_map.h \
+  ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/functional \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/binary_function.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/binary_negate.h \
@@ -329,6 +327,8 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/remainder.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/rounding_functions.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/trigonometric_functions.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdlib.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdlib.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__iterator/erase_if_container.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__iterator/ranges_iterator_traits.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__memory_resource/polymorphic_allocator.h \
@@ -454,13 +454,6 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/perfect_forward.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_back.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_front.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_CDC.hpp \
-  ../StellarisWare/driverlib/usb.h ../StellarisWare/driverlib/timer.h \
-  ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
-  ../StellarisWare/driverlib/rom_map.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
-  ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/adjacent_find.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/all_of.h \
@@ -636,5 +629,4 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_contains_subrange.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_ends_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_starts_with.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
-  ../StellarisWare/inc/hw_memmap.h ../StellarisWare/inc/hw_uart.h
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h

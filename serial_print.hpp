@@ -2,17 +2,14 @@
 #include "fifo_ring.hpp"
 #include<stdarg.h>
 
-#ifdef __cplusplus extern "C"{
-#endif
-#define DEPRECATED
+ extern "C"{
 #include "hw_types.h"
 #include "sysctl.h"
 #include "hw_sysctl.h"
 #include "uart.h"
-#include <stdlib.h>
+ }
+ #include <stdlib.h>
 #include <functional>
-#ifdef __cplusplus }
-#endif
 
 typedef  void(*UARTPrint_t)(uint32_t,uint8_t) ;
 typedef  void(*FIFORingPrint_t)(uint32_t,uint8_t);

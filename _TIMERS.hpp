@@ -2,86 +2,150 @@
 extern "C"{
 #include <stdint.h>
 #include <stdbool.h>
+#include "timer.h"
+#include "sysctl.h"
+#include "rom.h"
+#include "rom_map.h"
+#include"interrupt.h"
+
+
+
 }
+#include <functional>
+#include <algorithm>
+extern "C"{
+ void ISR0();
+ void ISR1();
+ void ISR2();
+ void ISR3();
+ void ISR4();
+ void ISR5();
+ void ISR6();
+ void ISR7();
+ void ISR8();
+ void ISR9();
+};
+
+class TimerISR {   // без static class
+public:
+    static uint8_t isr_count;
+    static std::function<void()> lmd[10];
+    static void (*ISR[10])();
+
+    static void Registration(uint32_t b, uint32_t t, std::function<void()> isr);
+    static void InitTable();  // один раз при старте
+};
+/*static class TimerISR{
+public:
+static uint8_t isr_count;
 
 
-struct _TimersIntRegisterList{
-bool TIM0A_TIMEOUT_INT:1;
-bool TIM0B_TIMEOUT_INT:1;
-bool TIM1A_TIMEOUT_INT:1;
-bool TIM1B_TIMEOUT_INT:1;
-struct Timer32* pT0A;
-struct Timer32* pT0B;
-struct Timer32* pT1A;
-struct Timer32* pT1B;
-}TimersIntRegisterList;
+static  std::function<void()> lmd[10];
+static void (*ISR[10])();
 
-enum TimerPeriodes{pInvalid=0xFFFF,pT1=0,pT2=1,pT3=2,pT4=3,pT5=4,pT6=5,pT7=6,pT8=7,pT9=8};
-struct Timer32{
-uint32_t ExtCnt;
-uint32_t T0;
-bool T0_int:1;
-  union{
-    struct {   
-    const uint32_t T1;
-    const uint32_t T2;
-    const uint32_t T3;
-    const uint32_t T4;
-    const uint32_t T5;
-    const uint32_t T6;
-    const uint32_t T7;
-    const uint32_t T8;
-    const uint32_t T9;
-    };
-    uint32_t T[9];
-    }ExtPeriodes;
-    union{
-    struct {   
-    const uint32_t presc1;
-    const uint32_t presc2;
-    const uint32_t presc3;
-    const uint32_t presc4;
-    const uint32_t presc5;
-    const uint32_t presc6;
-    const uint32_t presc7;
-    const uint32_t presc8;
-    const uint32_t presc9;
-    };
-    uint32_t P[9];
-    }Presc;
-     union{
-    struct {   
-     bool T1_int;
-     bool T2_int;
-     bool T3_int;
-     bool T4_int;
-     bool T5_int;
-     bool T6_int;
-     bool T7_int;
-     bool T8_int;
-     bool T9_int;
-    };
-    bool F[9];
-    }IntF;
+static void Registration(uint32_t b,uint32_t t, std::function<void()> isr){
+lmd[isr_count]=isr;
+TimerIntRegister(b,t,ISR[isr_count]);
+}
+TimerISR(){
+ISR[0]=ISR0;
+ISR[1]=ISR1;
+ISR[2]=ISR2;
+ISR[3]=ISR3;
+ISR[4]=ISR4;
+ISR[5]=ISR5;
+ISR[6]=ISR6;
+ISR[7]=ISR7;
+ISR[8]=ISR8;
+ISR[9]=ISR9;
+}
+};
+*/
+template<uint32_t timer_base, uint32_t timer_cfg_bit_per,
+uint32_t sysctl_periferal,
+uint32_t timer_letter,
+uint32_t timer_timeout,
+uint32_t period_us,uint32_t... ext_periodes>
+
+class TimerPeriodic_us{
+
+class InerStruct{
+  public:
+  uint32_t period;
+  uint32_t load;
+  uint32_t presc;
+  bool  int_flag;
+
+  InerStruct(uint32_t p0,uint32_t p){
+    period=p;
+    load=SysCtlClockGet()/1000000 * p0 - 1;
+    presc=p/p0;
+    int_flag=false;
+  };
+ // uint32_t GetLoad(){return load; }
+ // uint32_t GetPresc(){return presc;}
+  bool& IntFlag(){return int_flag;} 
+  };
+
+InerStruct main_period = {InerStruct{period_us,period_us}};
+uint8_t  ext_periodes_cnt=sizeof...(ext_periodes);
+uint32_t max_ext_period = (std::max)({ext_periodes...});
+InerStruct ExtPeriodes[sizeof...(ext_periodes)]={InerStruct{period_us,ext_periodes}...};
+
+
 bool TIMER_IS_INIT;
 bool TIMER_IS_ENABLE;
-const uint32_t SYSCTL_PERIPH_TIMER;
-const uint32_t TIMER_BASE;
-const uint32_t TIMER_AB;
-const uint32_t TIMER_TIMEOUT;
-const uint32_t INT_TIMER_N_AB;
-  void (*SetMainPeriod)(struct Timer32*,uint32_t);
-  enum TimerPeriodes (*AddExtPeriod)(struct Timer32*,uint32_t);
+
+void ISR(){
+static uint32_t counter=0;
+  uint32_t ts=TimerIntStatus(timer_base,true);
+
+  if( ts&timer_timeout){
+        TimerIntClear(timer_base, timer_timeout);
+        main_period.int_flag=true;
+ 
+
+        for(int i=0;i<ext_periodes_cnt;++i){
+          if(counter%ExtPeriodes[i].presc==0){
+          ExtPeriodes[i].int_flag=true;
+          if(ExtPeriodes[i].period==max_ext_period)counter=0;
+            else ++counter;
+          }
+        }
+  }
+};
+public:
+TimerPeriodic_us(){
+TIMER_IS_INIT=false;
+    SysCtlPeripheralEnable(sysctl_periferal);
+
+    TimerDisable(timer_base, timer_letter);
+
+    TimerConfigure(timer_base, timer_cfg_bit_per);
+
+    TimerLoadSet(timer_base,timer_letter,main_period.load);
+    TimerISR::Registration(timer_base,timer_letter,[this](){
+    this->ISR();
+    });
+  //  TimerIntRegister(timer_base,timer_letter,Timer_ISR_Wrapper);
+    TimerIntClear(timer_base, timer_timeout);
+    TimerIntEnable(timer_base, timer_timeout);
+TIMER_IS_INIT=true;
+};
+void Enable(){
+if(TIMER_IS_ENABLE==false&&TIMER_IS_INIT){
+    TimerEnable(timer_base,timer_letter);
+    TimerIntEnable(timer_base,timer_timeout);
+    TIMER_IS_ENABLE=true;
+    }
+};
+void Disable(){
+  if(TIMER_IS_ENABLE==true&&TIMER_IS_INIT){
+    MAP_TimerDisable(timer_base, timer_letter);
+    TimerIntDisable(timer_base, timer_timeout);
+    TIMER_IS_ENABLE=false;
+    }
+  }
+bool& IntFlag(uint8_t i){return ExtPeriodes[i].IntFlag();} 
 };
 
-
-//структуры
-struct _Timer0A_us_prescallers{
-uint32_t MainPeriod;
-uint32_t ScalSmall;
-uint32_t ScalBig;
-};
-//функции
-extern void Timer_SetMainPeriod_us(struct Timer32* t,uint32_t P_us);
-extern enum TimerPeriodes Timer_AddExtPeriod_us(struct Timer32* t,uint32_t P_us);
-extern void Timer_us_Init(struct Timer32* t );
