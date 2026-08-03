@@ -1,33 +1,22 @@
 
 #include "hw_types.h"
 #include "_USB.hpp"
-/*
-extern "C" {
-void USBISR0() { if (USB_ISR::lmd[0]) USB_ISR::lmd[0](); }
-void USBISR1() { if (USB_ISR::lmd[1]) USB_ISR::lmd[1](); }
-void USBISR2() { if (USB_ISR::lmd[2]) USB_ISR::lmd[2](); }
-void USBISR3() { if (USB_ISR::lmd[3]) USB_ISR::lmd[3](); }
-}
+void UsbISR::Registration(std::function<void()> isr, uint32_t sw_def, ...){
+ va_list args;
+    va_start(args, sw_def);
 
-// ===== вот то, чего не хватает линкеру =====
-uint8_t USB_ISR::isr_count = 0;
-std::function<void()> USB_ISR::lmd[4];
-void (*USB_ISR::ISR[4])() = {
-    USBISR0, USBISR1, USBISR2, USBISR3
-};
+    // первый параметр
+    uint32_t b = sw_def;
 
-void USB_ISR::InitTable()
-{
-    // таблица уже инициализирована выше; isr_count сброс при желании
-    isr_count = 0;
-}
-
-void USB_ISR::Registration(uint32_t b, std::function<void()> isr)
-{
-    if (isr_count >= 4)
-        return; // переполнение
+    if (isr_count >= 32) {
+        va_end(args);
+        return;
+    }
 
     lmd[isr_count] = std::move(isr);
-    TimerIntRegister(b,  USBISR[isr_count]);
+    USBIntRegister(b, ISR[isr_count]);
     ++isr_count;
-};*/
+
+    va_end(args);
+}
+

@@ -69,9 +69,11 @@
       <file file_name="_CAN.hpp" />
       <file file_name="_CDC.hpp" />
       <file file_name="_TIMERS.hpp" />
+      <file file_name="_USB.hpp" />
       <file file_name="fifo_ring.hpp" />
       <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
+      <file file_name="USB_CONSTS.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
     </folder>
     <folder Name="Setup" />
@@ -90,7 +92,6 @@
       <file file_name="System/Cortex_M_Startup.s" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
-    <file file_name="_USB.hpp" />
     <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>

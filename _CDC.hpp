@@ -14,9 +14,8 @@ extern "C"{
 //#define TARGET_IS_TEMPEST_RC1
 #include "rom.h"
 #include "rom_map.h"
-#include "USB_THIS_PROGRAM_DEFS.hpp"
 }
-
+#include "USB_THIS_PROGRAM_DEFS.hpp"
 typedef enum
 {
     CDC_SS_NONE        = 0x00, // ничего не активно

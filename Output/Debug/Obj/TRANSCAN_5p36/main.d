@@ -459,6 +459,7 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
   ../StellarisWare/driverlib/rom_map.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
