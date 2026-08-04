@@ -459,7 +459,9 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
   ../StellarisWare/driverlib/rom_map.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  ../StellarisWare/inc/hw_memmap.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
@@ -640,4 +642,4 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalISR.hpp \
-  ../StellarisWare/inc/hw_memmap.h ../StellarisWare/inc/hw_uart.h
+  ../StellarisWare/inc/hw_uart.h

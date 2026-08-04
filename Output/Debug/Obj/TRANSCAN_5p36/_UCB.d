@@ -4,7 +4,7 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
   ../StellarisWare/driverlib/usb.h ../StellarisWare/inc/hw_usb.h \
   ../StellarisWare/driverlib/sysctl.h ../StellarisWare/driverlib/rom.h \
-  ../StellarisWare/driverlib/rom_map.h \
+  ../StellarisWare/driverlib/rom_map.h ../StellarisWare/inc/hw_memmap.h \
   ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdint \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config \
@@ -636,4 +636,14 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdbool.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_log2.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_width.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/endian.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/has_single_bit.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/byteswap.h

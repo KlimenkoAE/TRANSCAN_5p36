@@ -28,6 +28,7 @@ typedef enum
     CDC_SS_PARITY_ERR  = 0x20, // Parity error
     CDC_SS_OVERRUN     = 0x40  // Overrun error
 } CDC_SerialState_t;
+
  union CDC_Flags{
   struct {
   bool COMMUNICATION_INT:1;
@@ -54,37 +55,25 @@ struct _ImmediaetyTransferState{
     uint32_t pr_pos;
 };
 
-typedef struct
-{
-    uint32_t dwDTERate;      // Baudrate
-    uint8_t  bCharFormat;    // Stop bits
-    uint8_t  bParityType;    // Parity
-    uint8_t  bDataBits;      // Data bits
-} CDC_LineCoding_t;
+
+union CDC_LineCoding_t{
+struct {uint32_t dwDTERate;   // скорость, little-endian
+        uint8_t  bCharFormat; // стоп-биты
+        uint8_t  bParityType; // паритет
+        uint8_t  bDataBits;   // биты данных 
+        };
+        uint8_t arr[7];
+};
+
 
 template
 <
- uint16_t tx_fr_size
-,uint16_t rx_fr_size
-
-,uint32_t USB_BASE
-
-,uint32_t DATA_IN_EP
-,uint32_t DATA_IN_EP_SZ
-,uint32_t DATA_IN_INT
-
-,uint32_t DATA_OUT_EP
-,uint32_t DATA_OUT_EP_SZ
-,uint32_t DATA_OUT_INT
-
-,uint32_t COMMUNICATION_EP
-,uint32_t CDC0_COMMUNICFTION_EP_SZ
-,uint32_t COMMUNICATION_INT    
+CDC_INIT_t INIT
 >
 
 class CDC{
-  FIFO_Ring<tx_fr_size> fr_RX; 
-  FIFO_Ring<rx_fr_size> fr_TX;
+  FIFO_Ring<INIT.tx_fr_size> fr_RX; 
+  FIFO_Ring<INIT.rx_fr_size> fr_TX;
   CDC_LineCoding_t IineCoding;
   Serial_Print Print;
 
@@ -115,17 +104,17 @@ void Send_Device_State(CDC_SerialState_t b8)
     };
     notify[8] = b8;       // DCD/DSR/Break/errors
     notify[9] = 0x00;
-if(MAP_USBEndpointDataPut(USB_BASE, COMMUNICATION_EP, notify, 10)!=0)return;
-    MAP_USBEndpointDataSend(USB_BASE, COMMUNICATION_EP, USB_TRANS_IN);
+if(MAP_USBEndpointDataPut(INIT.USB_BASE, INIT.COMMUNICATION_EP, notify, 10)!=0)return;
+    MAP_USBEndpointDataSend(INIT.USB_BASE, INIT.COMMUNICATION_EP, USB_TRANS_IN);
 }
 
 
 void TX_Immediacy( uint8_t* buf, uint32_t sz) {
     if(!Flags.DATA_IN_BUSY/*&&CDC_Host_Curr_State==CDC_SS_DCD_DSR*/) {
         // сразу отправляем первый кусок
-        uint32_t chunk = (sz > DATA_IN_EP_SZ) ? DATA_IN_EP_SZ : sz;
-        MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP, buf, chunk);
-        MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+        uint32_t chunk = (sz > INIT.DATA_IN_EP_SZ) ? INIT.DATA_IN_EP_SZ : sz;
+        MAP_USBEndpointDataPut(INIT.USB_BASE, INIT.DATA_IN_EP, buf, chunk);
+        MAP_USBEndpointDataSend(INIT.USB_BASE, INIT.DATA_IN_EP, USB_TRANS_IN);
         Flags.DATA_IN_BUSY = true;
 
         // если буфер длиннее — запомним остаток
@@ -157,22 +146,22 @@ uint16_t cnt_for_tx=0;
         return;
     }
     // Пока есть полный пакет
-    while(fr_TX->Count() >= DATA_IN_EP_SZ) {
-        uint8_t pkt[DATA_IN_EP_SZ];
+    while(fr_TX->Count() >= INIT.DATA_IN_EP_SZ) {
+        uint8_t pkt[INIT.DATA_IN_EP_SZ];
 
-        cnt_for_tx =fr_TX->read_range(pkt, DATA_IN_EP_SZ);   // вытащить из кольца
+        cnt_for_tx =fr_TX->read_range(pkt, INIT.DATA_IN_EP_SZ);   // вытащить из кольца
         TX_Immediacy(pkt, cnt_for_tx);
     }
 
     // Остаток < CDC0_TX_SZ
     if(fr_TX->Count() > 0) {
-        uint8_t pkt[DATA_IN_EP_SZ];
+        uint8_t pkt[INIT.DATA_IN_EP_SZ];
         cnt_for_tx = fr_TX->read_range (pkt, fr_TX->Count());
         TX_Immediacy(pkt, cnt_for_tx);
     }
-    else if(cnt_for_tx%DATA_IN_EP_SZ==0){
-     MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP, NULL, 0);
-      MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+    else if(cnt_for_tx%INIT.DATA_IN_EP_SZ==0){
+     MAP_USBEndpointDataPut(INIT.USB_BASE, INIT.DATA_IN_EP, NULL, 0);
+      MAP_USBEndpointDataSend(INIT.USB_BASE, INIT.DATA_IN_EP, USB_TRANS_IN);
       Flags.DATA_IN_BUSY = true;
     }
 }
@@ -181,12 +170,12 @@ uint16_t cnt_for_tx=0;
     if(Flags.PRIORITY_PENDING) {
         if(ImmediaetyTransferState.pr_pos < ImmediaetyTransferState.pr_len) {
             uint32_t remaining = ImmediaetyTransferState.pr_len - ImmediaetyTransferState.pr_pos;
-            uint32_t chunk = (remaining > DATA_IN_EP_SZ) ? DATA_IN_EP_SZ : remaining;
+            uint32_t chunk = (remaining > INIT.DATA_IN_EP_SZ) ? INIT.DATA_IN_EP_SZ : remaining;
 
-            MAP_USBEndpointDataPut(USB_BASE, DATA_IN_EP,
+            MAP_USBEndpointDataPut(INIT.USB_BASE, INIT.DATA_IN_EP,
                                    ImmediaetyTransferState.pr_buf + ImmediaetyTransferState.pr_pos,
                                    chunk);
-            MAP_USBEndpointDataSend(USB_BASE, DATA_IN_EP, USB_TRANS_IN);
+            MAP_USBEndpointDataSend(INIT.USB_BASE, INIT.DATA_IN_EP, USB_TRANS_IN);
             Flags.DATA_IN_BUSY = true;
             ImmediaetyTransferState.pr_pos += chunk;
         } else {
@@ -197,8 +186,8 @@ uint16_t cnt_for_tx=0;
 }
 
 void TX_InterrupHandler(){
-    uint32_t st  = USBEndpointStatus(USB_BASE, DATA_IN_EP);
-    MAP_USBDevEndpointStatusClear(USB_BASE, DATA_IN_EP, st);
+    uint32_t st  = USBEndpointStatus(INIT.USB_BASE, INIT.DATA_IN_EP);
+    MAP_USBDevEndpointStatusClear(INIT.USB_BASE, INIT.DATA_IN_EP, st);
     
 
     Flags.DATA_IN_INT = true;   // бросаем флаг "было прерывание"
@@ -208,26 +197,26 @@ void TX_InterrupHandler(){
 }
 
 void RX_InterrupHandler(){
-   uint32_t st =USBEndpointStatus(USB_BASE, DATA_OUT_EP);
-   MAP_USBDevEndpointStatusClear(USB_BASE, DATA_OUT_EP, st);
-       unsigned long len = MAP_USBEndpointDataAvail(USB_BASE, DATA_OUT_EP);
+   uint32_t st =USBEndpointStatus(INIT.USB_BASE, INIT.DATA_OUT_EP);
+   MAP_USBDevEndpointStatusClear(INIT.USB_BASE, INIT.DATA_OUT_EP, st);
+       unsigned long len = MAP_USBEndpointDataAvail(INIT.USB_BASE,INIT. DATA_OUT_EP);
         if (len > 0)
         {
     
-            uint8_t rx_buf[DATA_OUT_EP_SZ];        
-            MAP_USBEndpointDataGet(USB_BASE, DATA_OUT_EP, rx_buf, &len);
+            uint8_t rx_buf[INIT.DATA_OUT_EP_SZ];        
+            MAP_USBEndpointDataGet(INIT.USB_BASE, INIT.DATA_OUT_EP, rx_buf, &len);
             // Здесь извлекаю из фифо в fr_CDC_RX
             fr_RX.write_range(rx_buf,len);                 
         }
     // Обязательно разрешаем следующий приём
-     MAP_USBDevEndpointDataAck(USB_BASE, DATA_OUT_EP, false);
+     MAP_USBDevEndpointDataAck(INIT.USB_BASE, INIT.DATA_OUT_EP, false);
      Flags.DATA_OUT_INT=true;
 
 }
 
 void Communication_InterrupHandler(){
-    uint32_t st=USBEndpointStatus(USB_BASE, COMMUNICATION_EP);
-    MAP_USBDevEndpointStatusClear(USB_BASE, COMMUNICATION_EP, st);
+    uint32_t st=USBEndpointStatus(INIT.USB_BASE, INIT.COMMUNICATION_EP);
+    MAP_USBDevEndpointStatusClear(INIT.USB_BASE, INIT.COMMUNICATION_EP, st);
     Flags.COMMUNICATION_BUSY = false;
     Flags.COMMUNICATION_INT=true;
     }

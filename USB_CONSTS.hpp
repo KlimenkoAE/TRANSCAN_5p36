@@ -52,8 +52,7 @@
 #define EP_BULK                 0x02
 #define EP_INTERRUPT            0x03
 /*device status*/
-#define REMOTE_WAKEUP 1
-#define SELF_POWRED 1
+
 
 // CDC Class Requests
 #define USB_CDC_SET_LINE_CODING          0x2120
@@ -67,10 +66,12 @@
 #define VC_READ_BUFFER_8 0xC0D0
 #define VC_WRITE_BUFFER_8 0x40D1
 
-class CDC_DEVICE_CLASS;  
+ 
 
 #define EP_IN(n) (0x8##n)
 #define EP_OUT(n) (0x0##n)
+
+
 
 
 

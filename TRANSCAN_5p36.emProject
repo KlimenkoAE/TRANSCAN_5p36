@@ -47,6 +47,7 @@
       arm_linker_stack_size="2048"
       arm_linker_variant="SEGGER"
       arm_target_device_name="LM3S5P36"
+      arm_target_interface_type="SWD"
       c_user_include_directories=".;../StellarisWare/inc/;../StellarisWare/driverlib/"
       debug_stack_pointer_start="__stack_end__"
       debug_target_connection="J-Link"
@@ -60,6 +61,7 @@
       project_type="Executable" />
     <configuration
       Name="Debug"
+      arm_target_interface_type="SWD"
       c_user_include_directories="."
       gcc_cplusplus_language_standard="c++23" />
     <configuration
@@ -71,8 +73,10 @@
       <file file_name="_TIMERS.hpp" />
       <file file_name="_USB.hpp" />
       <file file_name="fifo_ring.hpp" />
+      <file file_name="periferalInterruptsHandlers.hpp" />
       <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
+      <file file_name="USB_CLASSES.hpp" />
       <file file_name="USB_CONSTS.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
     </folder>

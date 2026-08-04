@@ -11,42 +11,10 @@
  #include <stdlib.h>
 #include <functional>
 
-typedef  void(*UARTPrint_t)(uint32_t,uint8_t) ;
-typedef  void(*FIFORingPrint_t)(uint32_t,uint8_t);
 
-template<typename ...> void put_byte_to_serial(...){
-
-};
-template<uint32_t base> void put_byte_to_serial(uint8_t b){
-UARTCharPut(base,b);
-};
-
-template<uint32_t sz,FIFO_Ring<sz>* fr> void put_byte_to_serial(uint8_t b){
-fr->add_byte(b);
-};
-
-
-template<typename...>
-class __Serial_Print{
-
-template <uint32_t sz>
-static void(*f)( FIFO_Ring<sz >* fr,uint8_t b)=put_byte_to_serial<FIFO_Ring<sz>*,uint8_t>;
-
-};
-
-using PutByteFn = void(*)(void* ctx, uint8_t b);
-//using PutByteMethod = void(*)(void* ctx, uint8_t b);
 class Serial_Print{
 
-void* ctx;;
-
 public:
- /*   Serial_Print(void* context, PutByteFn f) : ctx(context), fn(f) {}
-
-  void add_byte(uint8_t b) { fn(ctx, b); }
-
-
-*/
 
     std::function<void(uint8_t)> fn;
 
