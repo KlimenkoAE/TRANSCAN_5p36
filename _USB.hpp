@@ -17,7 +17,6 @@ extern "C"{
 
 #include "periferalISR.hpp"
 #include "USB_CONSTS.hpp"
-
 #include "USB_THIS_PROGRAM_DEFS.hpp"
 #include "periferalInterruptsHandlers.hpp"
 
@@ -94,7 +93,7 @@ unsigned long SetupPacketSz = MAP_USBEndpointDataAvail(USB0_BASE, USB_EP_0);
 
   if(SetupPacketSz>0)
   {
-   Enumerator.USB_COM_Vector(int_COM_status);
+   Enumerator.USB_COM_Vector(int_COM_status,SetupPacketSz);
     int_COM_status&=~(USB_INTEP_0);
   }
 }
@@ -119,7 +118,7 @@ class USBEnumerator{
 typedef enum {Suspend,Default,Adressed,Configurated}usb_device_state; 
  static SetupStage_t SetupStage;
  static union _Buffer{
-		struct{;
+		struct{
 		uint8_t bmRequestType;
 		uint8_t bRequest;
 		uint8_t wValueL;
@@ -129,7 +128,13 @@ typedef enum {Suspend,Default,Adressed,Configurated}usb_device_state;
 		uint8_t wLengthL;
 		uint8_t wLengthH;
 		};
-		struct{;
+                struct{
+                uint16_t wRequest;
+                uint16_t wValue;
+                uint16_t wIndex;
+                uint16_t wLengt;
+                }wFields;
+		struct{
 			uint8_t b0;
 			uint8_t b1;
 			uint8_t b2;
@@ -139,9 +144,6 @@ typedef enum {Suspend,Default,Adressed,Configurated}usb_device_state;
 			uint8_t b6;
 			uint8_t b7;
 		};
-                struct{
-                
-                };
 		uint8_t arr[8];
   };
 static _Buffer buffer={.arr={0,0,0,0,0,0,0,0}};
@@ -150,9 +152,12 @@ static void EP_StatusClear(uint32_t ep){
     MAP_USBDevEndpointStatusClear(usb_base, ep, st);
 }
 
-inline int USB_COM_Vector(uint32_t int_COM_status){
 
-    MAP_USBEndpointDataGet (USB0_BASE, USB_EP_0, (uint8_t*)&buffer,  &SetupPacketSz);
+
+inline int USB_COM_Vector(uint32_t int_COM_status,unsigned long   SetupPacketSz){
+
+    MAP_USBEndpointDataGet (usb_base, USB_EP_0, (uint8_t*)&buffer,  &SetupPacketSz);
+
       if(SetupStage.Stage==SETUP)
           SetupStage.Request=(uint16_t)(buffer.bmRequestType)<<8|(buffer.bRequest);
     processingSetupPackage(SetupStage.Request);
@@ -209,6 +214,7 @@ static void processingSetupPackage(uint16_t rq){
                         MAP_USBEndpointDataToggleClear(usb_base, USB_EP_1, USB_EP_DEV_IN);
                          EP_StatusClear(USB_EP_1);
                         G_Flags.EP1_IN_BUSY = false;
+                        Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x81);
                         MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
                         break;
 
@@ -216,9 +222,11 @@ static void processingSetupPackage(uint16_t rq){
                         MAP_USBDevEndpointStallClear(usb_base, USB_EP_2, USB_EP_DEV_OUT);
                         MAP_USBEndpointDataToggleClear(usb_base, USB_EP_2, USB_EP_DEV_OUT);
                          EP_StatusClear(USB_EP_2);
+                          Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x02);
                         MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
                         // снова разрешить приём на OUT
                         MAP_USBDevEndpointDataAck(usb_base, USB_EP_2, false);
+
                         break;
 
                     case 0x82: // EP2 IN — Bulk IN (типичный CDC)
@@ -228,6 +236,7 @@ static void processingSetupPackage(uint16_t rq){
                         CDC0_Flags.DATA_IN_BUSY = false; // 
                         CDC0_Flags.DATA_IN_INT=false;
                         CDC0_Flags.PRIORITY_PENDING= false;
+                        Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x82);
                         MAP_USBDevEndpointStallClear(usb_base, USB_EP_2, USB_EP_DEV_IN);
                         CDC0_TraceHostStatus(CDC_SS_DCD_DSR);
                         SysCtlDelay(DELAY_LOAD_1us*100);
@@ -237,11 +246,13 @@ static void processingSetupPackage(uint16_t rq){
                     case 0x83: // EP3 IN — только если такой endpoint есть
                         MAP_USBDevEndpointStallClear(usb_base, USB_EP_3, USB_EP_DEV_IN);
                         MAP_USBEndpointDataToggleClear(usb_base, USB_EP_3, USB_EP_DEV_IN);
+                         Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x83);
                         MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
                         break;
 
                     case 0x01: // EP1 OUT — на всякий случай (в логе бывало wIndex=0001)
                         // если EP1 OUT нет в дескрипторах — можно просто ACK
+                         Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x01);
                         MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
                         break;
 
@@ -306,6 +317,7 @@ static void processingSetupPackage(uint16_t rq){
 		
 		set_cfg();
                 CDC0_Flags.DATA_IN_ON=false;
+                Execute_ExtSetupHandler(SET_CONFIGURATION);
                 USBDevEndpointDataAck(usb_base, 0,true);
              //   ToDebugPrint.DebugPrintAdd(0,EP_CONTROL_STATUS_F,SET_CONFIGURATION,"SET_CONFIGURATION");
 		break;
@@ -340,7 +352,7 @@ MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, false);
 else
 {
  memcpy(LINE_CODING_Struct.arr, buffer.arr, SetupStage.data_len);  
-      
+    Execute_ExtSetupHandler(USB_CDC_SET_LINE_CODING);  
                 MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
 SetupStage.Stage=enumSetupStage::SETUP;
 }                  
@@ -349,7 +361,8 @@ SetupStage.Stage=enumSetupStage::SETUP;
 
                 // Отправляем текущую структуру Line Coding
                 MAP_USBEndpointDataPut(usb_base, USB_EP_0,
-                                       (uint8_t *)LINE_CODING_Struct.arr,sizeof(LINE_CODING_Struct.arr));
+              (uint8_t *)LINE_CODING_Struct.arr,sizeof(LINE_CODING_Struct.arr));
+                Execute_ExtSetupHandler(USB_CDC_GET_LINE_CODING) ; 
                 MAP_USBEndpointDataSend(usb_base,USB_EP_0,USB_TRANS_IN_LAST);
 
 
@@ -361,10 +374,11 @@ SetupStage.Stage=enumSetupStage::SETUP;
     
             //    break;
                 case USB_CDC_SET_CONTROL_LINE_STATE:
-                CDC_ControlState = ((uint16_t)buffer.wValueH << 8) | buffer.wValueL;
 
+                CDC_ControlState = ((uint16_t)buffer.wValueH << 8) | buffer.wValueL;
                 CDC0_TraceHostStatus(CDC_ControlState);
-               
+               Execute_ExtSetupHandler(USB_CDC_SET_CONTROL_LINE_STATE,0,wValue,buffer.wIndex,buffer.wL) ;
+
                 MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
                  break;	
 		
@@ -770,6 +784,7 @@ static bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t inde
 		switch(desc_type){
 
 			case DESC_TYPE_DEVICE:
+
 			SetUpAnswer((uint8_t*)&DeviceDescriptor,sizeof(DeviceDescriptor),host_await_sz);
                         return true;
 

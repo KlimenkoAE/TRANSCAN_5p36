@@ -20,7 +20,7 @@
 #define SET_INTERFACE          0x010B
 #define SYNCH_FRAME            0x820C
 #define GET_REPORT             0xA101
-#define SET_IDLE        	   0x210A
+#define SET_IDLE               0x210A
 //
 #define FEAT_ENDPOINT_HALT        0x0000
 #define FEAT_DEVICE_REMOTE_WAKEUP 0x0001

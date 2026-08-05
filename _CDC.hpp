@@ -89,7 +89,14 @@ public:
         : Print([this](uint8_t b){ fr_TX.add_byte(b); })
         ,TIMER_TX_INT_FLAG(timer_tx_f)
         ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
-    {}
+    {
+    ExtSetupHandlerRegister(std::function<void()> =[this](){
+    
+    },
+                                    uint32_t req,
+                                    uint8_t ep_addr=0)
+    
+    }
 
 ///////
 void Send_Device_State(CDC_SerialState_t b8)

@@ -1,8 +1,10 @@
 #pragma once
+
+#include "USB_THIS_PROGRAM_DEFS.hpp"
 #include <functional>
 
 #include <bit>
-
+#include <vector>
 /*
 #define USB_INTEP_DEV_OUT_15    0x80000000  // Endpoint 15 Device OUT Interrupt
 #define USB_INTEP_DEV_OUT_14    0x40000000  // Endpoint 14 Device OUT Interrupt
@@ -65,3 +67,99 @@ static  void Execute(uint32_t int_COM_status){
   handlers[EPIndex(int_ep)]=handler;
   }
 };
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+std::array<uint32_t,ExtSetupHandlersCnt> T1= {
+    GET_STATUS_DEVICE<<8|0x00,      
+    GET_STATUS_INTERF<<8|0x00,    
+   GET_STATUS_ENDPNT<<8|0x05,  
+   GET_STATUS_ENDPNT<<8|0x01,
+   GET_STATUS_ENDPNT<<8|0x02, 
+   GET_STATUS_ENDPNT<<8|0x03,
+   GET_STATUS_ENDPNT<<8|0x04,
+   GET_STATUS_ENDPNT<<8|0x85,
+   GET_STATUS_ENDPNT<<8|0x81,
+   GET_STATUS_ENDPNT<<8|0x82,
+   GET_STATUS_ENDPNT<<8|0x83,
+   GET_STATUS_ENDPNT<<8|0x84, 
+     CLEAR_FEATURE_DEVICE<<8|0x00,   
+     CLEAR_FEATURE_INTERF<<8|0x00,  
+     CLEAR_FEATURE_ENDPNT<<8|0x05, 
+   CLEAR_FEATURE_ENDPNT<<8|0x01,
+   CLEAR_FEATURE_ENDPNT<<8|0x02, 
+   CLEAR_FEATURE_ENDPNT<<8|0x03,
+   CLEAR_FEATURE_ENDPNT<<8|0x04,
+
+   CLEAR_FEATURE_ENDPNT<<8|0x85,
+   CLEAR_FEATURE_ENDPNT<<8|0x81,
+   CLEAR_FEATURE_ENDPNT<<8|0x82,
+   CLEAR_FEATURE_ENDPNT<<8|0x83,
+   CLEAR_FEATURE_ENDPNT<<8|0x84,
+  
+     SET_FEATURE_DEVICE<<8|0x00,    
+     SET_FEATURE_INTERF<<8|0x00,
+     
+     SET_FEATURE_ENDPNT<<8|0x00, 
+
+     CLEAR_FEATURE_ENDPNT<<8|0x05, 
+   CLEAR_FEATURE_ENDPNT<<8|0x01,
+   CLEAR_FEATURE_ENDPNT<<8|0x02, 
+   CLEAR_FEATURE_ENDPNT<<8|0x03,
+   CLEAR_FEATURE_ENDPNT<<8|0x04,
+
+   CLEAR_FEATURE_ENDPNT<<8|0x85,
+   CLEAR_FEATURE_ENDPNT<<8|0x81,
+   CLEAR_FEATURE_ENDPNT<<8|0x82,
+   CLEAR_FEATURE_ENDPNT<<8|0x83,
+   CLEAR_FEATURE_ENDPNT<<8|0x84,
+    
+     SET_ADDRESS<<8|0x00,            
+     GET_DESCRIPTOR_DEVICE<<8|0x00,  
+     GET_DESCRIPTOR_INTERF<<8|0x00,  
+     GET_DESCRIPTOR_ENDPNT<<8|0x00,  
+     SET_DESCRIPTOR<<8|0x00,        
+     GET_CONFIGURATION<<8|0x00,      
+     SET_CONFIGURATION<<8|0x00,      
+     GET_INTERFACE<<8|0x00,          
+     SET_INTERFACE<<8|0x00,          
+     SYNCH_FRAME<<8|0x00,            
+     GET_REPORT<<8|0x00,             
+     SET_IDLE<<8|0x00,               
+     FEAT_ENDPOINT_HALT<<8|0x00,        
+     FEAT_DEVICE_REMOTE_WAKEUP<<8|0x00, 
+     FEAT_TEST_MODE<<8|0x00            
+};
+
+std::function<void( uint16_t /*wValue = 0*/, uint16_t /*wIndex = 0*/, uint16_t /*wLength = 0*/)> ExtSetupHandlers[ExtSetupHandlersCnt];
+
+
+template <size_t N>
+constexpr uint8_t GetIndex(uint32_t val, const std::array<uint32_t, N>& array)
+{
+    for (uint8_t i = 0; i < N; ++i)
+    {
+        if (array[i] == val)
+            return i;
+    }
+
+   std::unreachable();
+}
+
+inline void ExtSetupHandlerRegister(std::function<void(uint16_t /*wValue = 0*/, uint16_t /*wIndex = 0*/, uint16_t /*wLength = 0*/)> h,
+                                    uint32_t req,
+                                    uint8_t ep_addr=0
+                                    )
+{
+    ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)] = std::move(h);
+}
+
+inline bool Execute_ExtSetupHandler(uint32_t req, uint8_t ep_addr=0,uint16_t  wValue = 0, uint16_t wIndex = 0, uint16_t wLength = 0)
+{
+    auto& h = ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)];
+    if (!h)
+        return false;
+
+    h(wValue , wIndex , wLength);
+    return true;
+}

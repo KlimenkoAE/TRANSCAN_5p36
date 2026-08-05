@@ -108,6 +108,10 @@ constexpr  CDC_INIT_t CDC_INIT={
 };
 
 
+
+constexpr uint8_t ExtSetupHandlersCnt=52;
+
+
 /////ЭТО ВСЕ ЗДЕСЬ ВРЕМЕННО
 #define DELAY_LOAD_1us 27
 #define DELAY_LOAD_1ms 26666
