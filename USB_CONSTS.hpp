@@ -1,30 +1,30 @@
 #pragma once
-/* коды запросов */
-#define GET_STATUS_DEVICE      0x8000
-#define GET_STATUS_INTERF      0x8100
-#define GET_STATUS_ENDPNT      0x8200
-#define CLEAR_FEATURE_DEVICE   0x0001
+// коды запросов провильно перевернутые значение имеет смысл конкреиного чиса в литл ендиан  
+#define GET_STATUS_DEVICE      0x0008
+#define GET_STATUS_INTERF      0x0081
+#define GET_STATUS_ENDPNT      0x0082
+#define CLEAR_FEATURE_DEVICE   0x0100
 #define CLEAR_FEATURE_INTERF   0x0101
-#define CLEAR_FEATURE_ENDPNT   0x0201
-#define SET_FEATURE_DEVICE     0x0003
-#define SET_FEATURE_INTERF     0x0103
-#define SET_FEATURE_ENDPNT     0x0203
-#define SET_ADDRESS            0x0005
-#define GET_DESCRIPTOR_DEVICE  0x8006
-#define GET_DESCRIPTOR_INTERF  0x8106
-#define GET_DESCRIPTOR_ENDPNT  0x8206
-#define SET_DESCRIPTOR         0x0007
-#define GET_CONFIGURATION      0x8008
-#define SET_CONFIGURATION      0x0009
-#define GET_INTERFACE          0x810A
-#define SET_INTERFACE          0x010B
-#define SYNCH_FRAME            0x820C
-#define GET_REPORT             0xA101
-#define SET_IDLE               0x210A
+#define CLEAR_FEATURE_ENDPNT   0x0102
+#define SET_FEATURE_DEVICE     0x0300
+#define SET_FEATURE_INTERF     0x0301
+#define SET_FEATURE_ENDPNT     0x0302
+#define SET_ADDRESS            0x0500
+#define GET_DESCRIPTOR_DEVICE  0x0680
+#define GET_DESCRIPTOR_INTERF  0x0681
+#define GET_DESCRIPTOR_ENDPNT  0x0682
+#define SET_DESCRIPTOR         0x0700
+#define GET_CONFIGURATION      0x0880
+#define SET_CONFIGURATION      0x0900
+#define GET_INTERFACE          0x0A81
+#define SET_INTERFACE          0x0B01
+#define SYNCH_FRAME            0x0C82
+#define GET_REPORT             0x01A1
+#define SET_IDLE               0x0A21
 //
 #define FEAT_ENDPOINT_HALT        0x0000
-#define FEAT_DEVICE_REMOTE_WAKEUP 0x0001
-#define FEAT_TEST_MODE            0x0002
+#define FEAT_DEVICE_REMOTE_WAKEUP 0x0100
+#define FEAT_TEST_MODE            0x0200
 //
 
 /* Типы дескрипторов */
@@ -55,9 +55,9 @@
 
 
 // CDC Class Requests
-#define USB_CDC_SET_LINE_CODING          0x2120
-#define USB_CDC_GET_LINE_CODING          0xA121
-#define USB_CDC_SET_CONTROL_LINE_STATE   0x2122
+#define USB_CDC_SET_LINE_CODING          0x2021
+#define USB_CDC_GET_LINE_CODING          0x21A1
+#define USB_CDC_SET_CONTROL_LINE_STATE   0x2221
 
 
 

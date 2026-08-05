@@ -45,14 +45,17 @@ uint32_t USB_BASE;
 uint32_t DATA_IN_EP;
 uint32_t DATA_IN_EP_SZ;
 uint32_t DATA_IN_INT;
+uint8_t DATA_IN_EP_ADDR;
 
 uint32_t DATA_OUT_EP;
 uint32_t DATA_OUT_EP_SZ;
 uint32_t DATA_OUT_INT;
+uint8_t  DATA_OUT_EP_ADDR;
 
 uint32_t COMMUNICATION_EP;
 uint32_t COMMUNICATION_EP_SZ;
-uint32_t COMMUNICATION_INT;  
+uint32_t COMMUNICATION_INT;
+uint8_t COMMUNICATION_EP_ADDR;  
 };
 enum enumSetupStage {SETUP,DATA};
 struct SetupStage_t{uint16_t Request;
@@ -67,3 +70,36 @@ struct {uint32_t dwDTERate;   // скорость, little-endian
         };
         uint8_t arr[7];
 };
+
+
+
+ union _Buffer{
+		struct{
+		uint8_t bmRequestType;
+		uint8_t bRequest;
+		uint8_t wValueL;
+		uint8_t wValueH;
+		uint8_t wIndexL;
+		uint8_t wIndexH;
+		uint8_t wLengthL;
+		uint8_t wLengthH;
+		};
+                struct{
+                uint16_t wRequest;
+                uint16_t wValue;
+                uint16_t wIndex;
+                uint16_t wLengt;
+                };
+		struct{
+			uint8_t b0;
+			uint8_t b1;
+			uint8_t b2;
+			uint8_t b3;
+			uint8_t b4;
+			uint8_t b5;
+			uint8_t b6;
+			uint8_t b7;
+		};
+		uint8_t arr[8];
+  };
+inline _Buffer buffer={.arr={0,0,0,0,0,0,0,0}};

@@ -74,7 +74,7 @@ CDC_INIT_t INIT
 class CDC{
   FIFO_Ring<INIT.tx_fr_size> fr_RX; 
   FIFO_Ring<INIT.rx_fr_size> fr_TX;
-  CDC_LineCoding_t IineCoding;
+  CDC_LineCoding_t LineCoding;
   Serial_Print Print;
 
   CDC_SerialState_t Host_Curr_State;
@@ -90,13 +90,85 @@ public:
         ,TIMER_TX_INT_FLAG(timer_tx_f)
         ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
     {
-    ExtSetupHandlerRegister(std::function<void()> =[this](){
-    
-    },
-                                    uint32_t req,
-                                    uint8_t ep_addr=0)
-    
-    }
+
+    // принимаем host status line
+    ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf, uint32_t sup_data ){
+                            this->TraceHostStatus(su_buf.wValue);
+                            },
+                            USB_CDC_SET_CONTROL_LINE_STATE,
+                            0
+    );
+
+    //принимаем LineCoding от Hosta
+ ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+                 memcpy(this->LineCoding.arr, buffer.arr, sup_data);
+                            },
+                            USB_CDC_SET_LINE_CODING,
+                            0
+    );
+    // Отправляем текущую структуру Line Coding
+
+ ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+                MAP_USBEndpointDataPut(INIT.USB_BASE, USB_EP_0,
+                                       (uint8_t *)this->LineCoding.arr,sizeof(this->LineCoding.arr));
+                MAP_USBEndpointDataSend(INIT.USB_BASE,USB_EP_0,USB_TRANS_IN_LAST);
+                            },
+                            USB_CDC_GET_LINE_CODING,
+                            0
+    );
+//flags
+
+ ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+               Flags.DATA_IN_ON=false;
+                            },
+                            SET_CONFIGURATION,
+                            0
+    );
+
+
+     ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+                              Flags.COMMUNICATION_BUSY = false; 
+                              Flags.COMMUNICATION_INT=false;
+                            },
+                            CLEAR_FEATURE_ENDPNT,
+                            CDC_INIT.COMMUNICATION_EP_ADDR
+    );
+         ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+                              fr_TX.clear();
+                              Flags.DATA_IN_BUSY = false; 
+                              Flags.DATA_IN_INT=false;
+                              Flags.PRIORITY_PENDING= false;
+                              TraceHostStatus(CDC_SS_DCD_DSR);
+                            },
+                            CLEAR_FEATURE_ENDPNT,
+                            CDC_INIT.DATA_IN_EP_ADDR
+    );
+         ExtSetupHandlerRegister
+    (
+    [this](const _Buffer& su_buf,uint32_t sup_data){
+                              fr_RX.clear();
+                              Flags.DATA_OUT_BUSY = false; 
+                              Flags.DATA_OUT_INT=false;
+                            },
+                            CLEAR_FEATURE_ENDPNT,
+                            CDC_INIT.DATA_OUT_EP_ADDR
+    );
+
+
+  }
+                           
 
 ///////
 void Send_Device_State(CDC_SerialState_t b8)

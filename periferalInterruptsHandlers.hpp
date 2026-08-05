@@ -131,7 +131,7 @@ std::array<uint32_t,ExtSetupHandlersCnt> T1= {
      FEAT_TEST_MODE<<8|0x00            
 };
 
-std::function<void( uint16_t /*wValue = 0*/, uint16_t /*wIndex = 0*/, uint16_t /*wLength = 0*/)> ExtSetupHandlers[ExtSetupHandlersCnt];
+std::function<void( const _Buffer&, uint32_t sup_data)> ExtSetupHandlers[ExtSetupHandlersCnt];
 
 
 template <size_t N>
@@ -146,7 +146,7 @@ constexpr uint8_t GetIndex(uint32_t val, const std::array<uint32_t, N>& array)
    std::unreachable();
 }
 
-inline void ExtSetupHandlerRegister(std::function<void(uint16_t /*wValue = 0*/, uint16_t /*wIndex = 0*/, uint16_t /*wLength = 0*/)> h,
+inline void ExtSetupHandlerRegister(std::function<void(const _Buffer&, uint32_t)> h,
                                     uint32_t req,
                                     uint8_t ep_addr=0
                                     )
@@ -154,12 +154,12 @@ inline void ExtSetupHandlerRegister(std::function<void(uint16_t /*wValue = 0*/, 
     ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)] = std::move(h);
 }
 
-inline bool Execute_ExtSetupHandler(uint32_t req, uint8_t ep_addr=0,uint16_t  wValue = 0, uint16_t wIndex = 0, uint16_t wLength = 0)
+inline bool Execute_ExtSetupHandler(uint32_t req, uint8_t ep_addr=0,const _Buffer& buf={0,0,0,0,0,0,0,0},uint32_t sup_data=0)
 {
     auto& h = ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)];
     if (!h)
         return false;
 
-    h(wValue , wIndex , wLength);
+    h(buf,sup_data);
     return true;
 }
