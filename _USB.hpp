@@ -4,10 +4,12 @@ extern "C"{
 #include "usb.h"
 #include "hw_usb.h"
 #include "sysctl.h"
+#include "hw_ints.h"
 #include "rom.h"
 #include "rom_map.h"
 #include "hw_memmap.h"
 #include"interrupt.h"
+#include "stdio.h"
 }
 #include <cstdint>
 #include <cstdbool>
@@ -20,6 +22,8 @@ extern "C"{
 #include "USB_THIS_PROGRAM_DEFS.hpp"
 #include "periferalInterruptsHandlers.hpp"
 
+#define USB_GEN_INT_EN USB_INTCTRL_RESET|USB_INTCTRL_SUSPEND|USB_INTCTRL_RESUME|USB_INTCTRL_SOF
+
 template<
 uint32_t usb_base,
 auto 
@@ -28,7 +32,7 @@ class USBEnumerator;
 class USB_DescriptorTypes;
 
 
-template<CDC_DEVICE_CLASS_t CDC_DC>
+template<auto CDC_DC>
 class USB_Descriptors;
 
 class UsbISR:IPeriferalISR{
@@ -39,20 +43,91 @@ void Registration(std::function<void()> isr, uint32_t sw_def, ...);
 //////////////////////////CLASS USB
 template<
 uint32_t usb_base,
-auto usb_dev
+uint32_t usb_int,//INT_USB0
+uint32_t sysctl_periferal,//SYSCTL_PERIFERAL_USB0
+auto usb_dev  //DEVICE_CLASS
 >
 class USB{
-enum _device_state {Suspend,Default,Adressed,Configurated}device_state; 
+enum _device_state device_state; 
 
 //INTERRUPT
 UsbISR UISR;
+public:
 USB(){
   UISR.Registration([this](){
       this->ISR();
       },usb_base);
+
+  ExtSetupHandlerRegister([this](const _Buffer& su_buf,uint32_t& sup_data){
+
+                   MAP_USBDevEndpointDataAck(usb_base,USB_EP_0,false);
+                         while(!(HWREGB(usb_base+ USB_CSRL0 )&USB_CSRL0_SETEND));
+                   MAP_USBDevAddrSet(usb_base,(unsigned long)(buffer.wValueL&0x7F));
+
+                    device_state=Adressed;
+                  },
+                  SET_ADDRESS);
+
+////////USB INIT
+ MAP_SysCtlPeripheralEnable(sysctl_periferal);
+
+  //The next step is to enable the USB PLL 
+  //so that the correct clocking is provided to the PHY.
+
+  MAP_SysCtlUSBPLLEnable();
+
+ // USBIntRegister(usb_base, ISR_USB);
+  
+MAP_IntEnable(usb_int);
+
+MAP_USBIntDisableControl(usb_base,USB_INTCTRL_ALL);
+MAP_USBIntEnableControl(usb_base,USB_GEN_INT_EN);
+
+MAP_USBIntDisableEndpoint(usb_base,USB_INTEP_ALL);
+MAP_USBIntEnableEndpoint(usb_base,USB_INT_EP0);
+
+MAP_USBIntEnable(usb_base,USB_INT_ALL );
+
+MAP_USBDevConnect(usb_base);
+
+/*
+volatile uint8_t txmaxp0;
+volatile uint8_t rxmaxp0;
+volatile uint8_t txfifosz;
+volatile uint8_t rxfifosz;
+volatile uint8_t txfifoadd;
+volatile uint8_t rxfifoadd;
+
+txmaxp0   = HWREGB(USB0_BASE + USB_O_TXMAXP1);
+rxmaxp0   = HWREGB(USB0_BASE + USB_O_RXMAXP1);
+
+txfifosz  = HWREGB(USB0_BASE + USB_O_TXFIFOSZ);
+rxfifosz  = HWREGB(USB0_BASE + USB_O_RXFIFOSZ);
+
+txfifoadd = HWREGB(USB0_BASE + USB_O_TXFIFOADD);
+rxfifoadd = HWREGB(USB0_BASE + USB_O_RXFIFOADD);
+
+
+volatile uint8_t csr0;
+volatile uint8_t count0;
+volatile uint8_t type0;
+
+csr0   = HWREGB(USB0_BASE + USB_O_CSRL0);
+count0 = HWREGB(USB0_BASE + USB_O_COUNT0);
+type0  = HWREGB(USB0_BASE + USB_O_TYPE0); */  // если есть
+
 }
 
 void ISR(){
+
+volatile uint8_t csr0;
+volatile uint8_t count0;
+volatile uint8_t type0;
+
+csr0   = HWREGB(USB0_BASE + USB_O_CSRL0);
+count0 = HWREGB(USB0_BASE + USB_O_COUNT0);
+type0  = HWREGB(USB0_BASE + USB_O_TYPE0);   // если есть
+
 uint32_t int_GEN_status;
 uint32_t int_COM_status;
   int_COM_status=MAP_USBIntStatusEndpoint(USB0_BASE);
@@ -89,12 +164,12 @@ return 0;
 inline int USB_COM_Vector(uint32_t int_COM_status){
 
  if(int_COM_status&USB_INTEP_0){
-unsigned long SetupPacketSz = MAP_USBEndpointDataAvail(USB0_BASE, USB_EP_0);
+unsigned long SetupPacketSz = MAP_USBEndpointDataAvail(usb_base, USB_EP_0);
 
   if(SetupPacketSz>0)
   {
-   Enumerator.USB_COM_Vector(int_COM_status,SetupPacketSz);
-    int_COM_status&=~(USB_INTEP_0);
+   Enumerator.USB_COM_Vector(int_COM_status,SetupPacketSz,device_state);
+  //  int_COM_status&=~(USB_INTEP_0);
   }
 }
 USB_COM_Handlers<usb_base>::Execute(int_COM_status);
@@ -104,8 +179,8 @@ return 0;
 
 ////////////////////
 
-class USBEnumerator<usb_base,usb_dev>Enumerator;
-class USB_Descriptors<usb_dev> Descriptors;
+USBEnumerator<usb_base,usb_dev>Enumerator;
+USB_Descriptors<usb_dev> Descriptors;
 
 };//class USB
 
@@ -115,8 +190,7 @@ uint32_t usb_base,
 auto usb_dev
 >
 class USBEnumerator{
-typedef enum {Suspend,Default,Adressed,Configurated}usb_device_state; 
- static SetupStage_t SetupStage;
+ inline static SetupStage_t SetupStage;
  
 static void EP_StatusClear(uint32_t ep){
  uint32_t st  = USBEndpointStatus(usb_base, ep);
@@ -124,18 +198,21 @@ static void EP_StatusClear(uint32_t ep){
 }
 
 
-
-inline int USB_COM_Vector(uint32_t int_COM_status,unsigned long   SetupPacketSz){
+public:
+inline int USB_COM_Vector(uint32_t int_COM_status,unsigned long   SetupPacketSz,_device_state& device_state){
 
     MAP_USBEndpointDataGet (usb_base, USB_EP_0, (uint8_t*)&buffer,  &SetupPacketSz);
-
+ uint32_t dbg_reg= HWREGB(usb_base + USB_O_CSRL0);
       if(SetupStage.Stage==SETUP)
           SetupStage.Request=buffer.wRequest;// (uint16_t)(buffer.bmRequestType)<<8|(buffer.bRequest);
-    processingSetupPackage(SetupStage.Request);
+    processingSetupPackage(SetupStage.Request,device_state);
+ //    dbg_reg= HWREGB(usb_base + USB_O_CSRL0);
+//    uint32_t dbg_stop=0;
+return 0;
 }
 
 //////////////////
-static void processingSetupPackage(uint16_t rq){
+static void processingSetupPackage(uint16_t rq,_device_state& device_state){
 	
 	switch(rq){
 		case GET_STATUS_DEVICE      :
@@ -255,12 +332,16 @@ static void processingSetupPackage(uint16_t rq){
 		break;
 
 		case SET_ADDRESS            :
-		set_addr();
+                Execute_ExtSetupHandler(SET_ADDRESS) ;
+             //   MAP_USBDevEndpointDataAck(usb_base,USB_EP_0,true);
+              //      while(!(HWREGB(usb_base+ USB_CSRL0 )&USB_CSRL0_SETEND));
+              //     MAP_USBDevAddrSet(usb_base,(unsigned long)(buffer.wValueL&0x7F));
 		break;
 
 		case GET_DESCRIPTOR_DEVICE  :
-                if(!USB_Descriptors<usb_dev>::DescriptorSend(buffer.wValueH,buffer.wLengthL,buffer.wValueL))goto no_implementation;	
-		break;
+              if(!USB_Descriptors<usb_dev>::DescriptorSend(buffer.wValueH,buffer.wLengthL,buffer.wValueL))
+              goto no_implementation;	
+        	break;
 
 		case GET_DESCRIPTOR_INTERF  :
                 goto no_implementation;
@@ -279,9 +360,8 @@ static void processingSetupPackage(uint16_t rq){
 		break;
 
 		case SET_CONFIGURATION      :
-		
-		set_cfg();
-                Execute_ExtSetupHandler(SET_CONFIGURATION);
+
+                Execute_ExtSetupHandler(SET_CONFIGURATION,0,buffer,(uint32_t&)device_state);
                 USBDevEndpointDataAck(usb_base, 0,true);
              //   ToDebugPrint.DebugPrintAdd(0,EP_CONTROL_STATUS_F,SET_CONFIGURATION,"SET_CONFIGURATION");
 		break;
@@ -315,7 +395,7 @@ MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, false);
 }
 else
 {
-    Execute_ExtSetupHandler(USB_CDC_SET_LINE_CODING,0,buffer,SetupStage.data_len);  
+    Execute_ExtSetupHandler(USB_CDC_SET_LINE_CODING,0,buffer,(uint32_t&)SetupStage.data_len);  
                 MAP_USBDevEndpointDataAck(usb_base, USB_EP_0, true);
 SetupStage.Stage=enumSetupStage::SETUP;
 }                  
@@ -324,7 +404,7 @@ SetupStage.Stage=enumSetupStage::SETUP;
 
                 // Отправляем текущую структуру Line Coding
                 Execute_ExtSetupHandler(USB_CDC_GET_LINE_CODING) ; 
-\
+
 
 
                 // Завершаем control-transfer
@@ -347,22 +427,7 @@ no_implementation:
 		break;
 	}
 };//Process packet
-static void set_addr(){
 
-  MAP_USBDevEndpointDataAck(usb_base,USB_EP_0,false);
-//USB0_CSRL0_R            (*((volatile unsigned char *)0x40050102))
-//USB0_BASE               0x40050000  // USB 0 Controller
-  while(!(USB0_CSRL0_R&USB_CSRL0_SETEND));
-
-  MAP_USBDevAddrSet(usb_base,(unsigned long)(buffer.wValueL&0x7F));
-
-  device_state=Adressed;
- print_d("%s",__FUNCTION__);
-
- // printf("  adress %d \n",MAP_USBDevAddrGet(USB0_BASE));
-
-  return;
-}
 
 static void status_dev(){
 //bus powred, remote wakeup
@@ -392,173 +457,31 @@ static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 };//Class USB_Enumerator
 
 
-class USB_DescriptorTypes
-{
-public:
-    USB_DescriptorTypes() = delete;
-
-protected:
-struct  
- DeviceDescriptor_t{ //DeviceDescriptor
-	uint8_t bLength;
-	uint8_t bDescriptorType;
-	uint8_t bcdUSBL;//in binary code decimal (i.e. 2.1 is 201H)
-	uint8_t bcdUSBH;
-	uint8_t bDeviceClass;
-	uint8_t bDeviceSubClass;
-	uint8_t bDeviceProtocol;
-	uint8_t bMaxPacketSize;
-	uint8_t idVendorL;
-	uint8_t idVendorH;
-	uint8_t idProductL;
-	uint8_t idProductH;
-	uint8_t bcdDeviceL;
-	uint8_t bcdDeviceH;
-	uint8_t iManufactured;
-	uint8_t iProduct;
-	uint8_t iSerialNumber;
-	uint8_t bNumConfiguration;
-};
-	
- struct
- ConfigurationDescriptor_t{//ConfigurationDescriptor
-        uint8_t bLength;
-        uint8_t bDescriptorType;
-        uint8_t wTotalLenghtL;
-        uint8_t wTotalLenghtH;
-        uint8_t bNumInterface;//число интерфейсов поддерживаемое конфигурацией
-        uint8_t bConfigurationValue;//значение используемое SetConfiguration()  для выбора этой конфигурации
-        uint8_t iConfiguration;//индекс строки описывающей конфигурацию
-        uint8_t bmAttributes; //b5-remote wakeup,b6 - self powered
-        uint8_t bMaxPower;// 2 ma per units, i.e. 50 - 100 ma
-	};
-
-template<IFC ifc>
- struct
- InterfaceDescriptor_t {//InterfaceDescriptor
-	inline static constexpr uint8_t bLength=9;
-	inline static constexpr uint8_t bDescriptorType=DESC_TYPE_INTERFACE;
-	inline static constexpr uint8_t bInterfaceNumber=ifc.number;//индекс интерфейса в массиве интерфейсов поддерживаемых конфигурацией
-	inline static constexpr uint8_t bAlternateSatting=0x00;//Если конфигурация поддерживает один интерфейс с несколькими альтернативными настройками - номер настройки
-	inline static constexpr uint8_t bNumEndpoints=ifc.ep_cnt;//сколько конечных точек кроме контрольной
-	inline static constexpr uint8_t bInterfaceClass=ifc.i_class;//0xFF - vendor specific All ather- (USB-IF)
-	inline static constexpr uint8_t bInterfaceSubClass=ifc.sub_class;//(USB-IF) if bInterfactClass is not 0xff
-	inline static constexpr uint8_t bInterfaceProtocol=ifc.protocol;//If this field is set to FFH, the device uses	a vendor-specific protocol for this	interface.
-	inline static constexpr uint8_t iInterface=0x00;//Index of string descriptor describing this interface
-};
-
-template<Endpoint ep>
- struct
- EPDescriptor_t{
-	inline static constexpr uint8_t bLength=0x7;
-	inline static constexpr uint8_t bDescriptorType=DESC_TYPE_ENDPOINT;
-	inline static constexpr uint8_t EndpointAddress=ep.address;//Bit 3...0: The endpoint number,	Bit 7: Direction, ignored for	control endpoints 0 = OUT 	1 = IN 
-	inline static constexpr uint8_t bmAttributes=ep.type;//Bits 1..0: 00 = Control,01 = Isochronous,10 = Bulk,11 = Interrupt,
-	//If not an isochronous endpoint bits 5..2 are reserved,else :Bits 3..2: 00 No Synchronization,	01 Asynchronous, 10 = Adaptive,	11 Synchronous
-	//Bits 5..4: 00 Data ,01 Feedback,10 Implicit feedback Data,11 = Reserved
-	inline static constexpr uint8_t wMaxPacketSizeL=ep.size&0xFF;//For all endpoints, bits 10..0 specify the maximum
-							//packet size (in bytes).
-							
-	inline static constexpr uint8_t wMaxPacketSizeH=ep.size>>8;//For high-speed isochronous and interrupt endpoints:
-							//Bits 12..11 specify the number of additional transaction
-							//opportunities per microframe:
-								//00 = None (1 transaction per microframe)
-								//01 = 1 additional (2 per microframe)
-								//10 = 2 additional (3 per microframe)
-								//11 = Reserved
-	inline static constexpr uint8_t bInterval=ep.interval; //Interval for polling endpoint for data transfers.
-					//Expressed in frames or microframes depending on the
-					//device operating speed (i.e., either 1 millisecond or
-					//125 μs units).
-					//For full-/high-speed isochronous endpoints, this value
-					//must be in the range from 1 to 16. The bInterval value
-					//is used as the exponent for a 2bInterval-1 value; e.g., a
-					//bInterval of 4 means a period of 8 (24-1).
-					//For full-/low-speed interrupt endpoints, the value of
-					//this field may be from 1 to 255.
-					//For high-speed interrupt endpoints, the bInterval value
-					//is used as the exponent for a 2**(bInterval-1) value; e.g., a
-					//bInterval of 4 means a period of 8 (2**4-1). This value
-					//must be from 1 to 16.
-					//For high-speed bulk/control OUT endpoints, the
-					//bInterval must specify the maximum NAK rate of the
-					//endpoint. A value of 0 indicates the endpoint never
-					//NAKs. Other values indicate at most 1 NAK each
-					//bInterval number of microframes. This value must be
-					//in the range from 0 to 255.
-};
 
 
-//////////////////////////CDC
-
- struct
-CDCHeaderDescriptor_t{
-    uint8_t bFunctionLength;      // Размер этого функционального дескриптора (байт)
-    uint8_t bDescriptorType;      // CS_INTERFACE (0x24) - класс-специфический дескриптор интерфейса
-    uint8_t bDescriptorSubtype;   // Header Functional Descriptor (0x00)
-    uint8_t bcdCDC_L;             // Версия спецификации CDC, младший байт
-    uint8_t bcdCDC_H;             // Версия спецификации CDC, старший байт
-} ;
-
- struct
- CDCACMDescriptor_t
-{//CDCACMDescriptor
-    uint8_t bFunctionLength;      // Размер дескриптора
-    uint8_t bDescriptorType;      // CS_INTERFACE (0x24)
-    uint8_t bDescriptorSubtype;   // Abstract Control Management Functional Descriptor (0x02)
-    uint8_t bmCapabilities;       // Возможности ACM-интерфейса
-                                // bit0 = поддержка Set_Comm_Feature/Clear_Comm_Feature
-                                // bit1 = поддержка Set_Line_Coding,
-                                //        Set_Control_Line_State,
-                                //        Get_Line_Coding
-                                // bit2 = Send_Break
-                                // bit3 = Network Connection
-} ;
-
- struct
- CDCCallManagementDescriptor_t
-{//CDCCallManagementDescriptor
-    uint8_t bFunctionLength;      // Размер дескриптора
-    uint8_t bDescriptorType;      // CS_INTERFACE (0x24)
-    uint8_t bDescriptorSubtype;   // Call Management Functional Descriptor (0x01)
-
-    uint8_t bmCapabilities;       // Возможности управления вызовами
-                               // bit0 = устройство самостоятельно обрабатывает Call Management
-                               // bit1 = Data Interface используется для Call Management
-
-    uint8_t bDataInterface;       // Номер Data Interface
-} ;
-
- struct
- CDCUnionDescriptor_t
-{//CDCUnionDescriptor
-    uint8_t bFunctionLength;        // Размер дескриптора
-    uint8_t bDescriptorType;        // CS_INTERFACE (0x24)
-    uint8_t bDescriptorSubtype;     // Union Functional Descriptor (0x06)
-
-    uint8_t bMasterInterface;       // Номер Communication Interface
-
-    uint8_t bSlaveInterface0;       // Номер первого Data Interface
-} ;
 
 
- struct 
- StringDescriptor_t{
-	uint8_t sz;
-	uint8_t type;
-	uint16_t str[7];
-	} ;
-};
+/*ConfigurationDescriptor_t cd;
+        InterfaceDescriptor_t idCommunication;
+        CDCHeaderDescriptor_t cdc_h;
+        CDCCallManagementDescriptor_t cdc_callMan;
+        CDCACMDescriptor_t cdc_acm;
+        CDCUnionDescriptor_t cdc_union;
+        EPDescriptor_t ep_communication;
 
+        InterfaceDescriptor_t idData;
+       
+       EPDescriptor_t ep_data_in;
+       EPDescriptor_t ep_data_out;*/
 //////////////////////////////////////////////////////////////////////////////
 
 
 
 template<
-CDC_DEVICE_CLASS_t CDC_DC 
+auto DEVICE 
 > class USB_Descriptors:USB_DescriptorTypes
 {
- DeviceDescriptor_t  DeviceDescriptor=
+inline static constexpr DeviceDescriptor_t  DeviceDescriptor=
  { //DeviceDescriptor
         .bLength=0x12,
 	.bDescriptorType=0x01,
@@ -568,10 +491,10 @@ CDC_DEVICE_CLASS_t CDC_DC
 	.bDeviceSubClass=0x00,
 	.bDeviceProtocol=0x00,
 	.bMaxPacketSize=EP0_SZ,
-	.idVendorL=CDC_DC.vid&0xFF,
-	.idVendorH=CDC_DC.vid>>8,
-	.idProductL=CDC_DC.pid&0xFF,
-	.idProductH=CDC_DC.pid>>8,
+	.idVendorL=DEVICE.vid&0xFF,
+	.idVendorH=DEVICE.vid>>8,
+	.idProductL=DEVICE.pid&0xFF,
+	.idProductH=DEVICE.pid>>8,
 	.bcdDeviceL=0x00,
 	.bcdDeviceH=0x01,
 	.iManufactured=0x01,
@@ -580,32 +503,164 @@ CDC_DEVICE_CLASS_t CDC_DC
 	.bNumConfiguration=0x01
 } ;
 
-static InterfaceDescriptor_t <
-CDC_DC.cdc_interfaces.interfaces[0]
->
-_id0;
-static EPDescriptor_t<
- CDC_DC.cdc_endpoints.endoints[0]
-  >_epd1 ;//int in
+static_assert(sizeof(DeviceDescriptor) == 18,
+              "DeviceDescriptor_t size error");
 
-static InterfaceDescriptor_t<
-CDC_DC.cdc_interfaces.interfaces[1]
-> _id1;
-static EPDescriptor_t<
- CDC_DC.cdc_endpoints.endoints[1]
-  >_epd2 ; //bulk in
-static EPDescriptor_t<
- CDC_DC.cdc_endpoints.endoints[2]
-  >_epd3 ; //bulk out 
 
+//constexpr static InterfaceDescriptor_t<> interfaceces_descs[CDC_DC.cdc_interfaces.cnt]=
+
+constexpr static InterfaceDescriptor_t
+MakeInterfaceDescriptor(const auto& ifc)
+{
+    return {
+        9,
+        DESC_TYPE_INTERFACE,
+        ifc.number,
+        0,
+        ifc.ep_cnt,
+        ifc.i_class,
+        ifc.sub_class,
+        ifc.protocol,
+        0
+    };
+}
+
+//ENDPOINT DESCS
+constexpr static EPDescriptor_t
+MakeEndpointDescriptor(const Endpoint& ep)
+{
+    return {
+        7,
+        DESC_TYPE_ENDPOINT,
+	 ep.address,	
+	 ep.type, 
+         static_cast<uint8_t>(ep.size&0xFF),
+         static_cast<uint8_t>(ep.size>>8),
+	 ep.interval
+    };
+}
+
+
+template<class IFC, std::size_t... I>
+constexpr static auto
+MakeInterfaceEndpointDescriptors(
+    const IFC& ifc,
+    std::index_sequence<I...>)
+{
+    return std::array<EPDescriptor_t, sizeof...(I)>{
+        MakeEndpointDescriptor(
+            ifc.endpoints.endpoints[I]
+        )...
+    };
+}
+///***********
+
+template<std::size_t... I>
+constexpr static auto
+MakeInterfaceDescriptors(std::index_sequence<I...>)
+{
+    return std::array<InterfaceDescriptor_t, sizeof...(I)>{
+        MakeInterfaceDescriptor(
+            get<I>(DEVICE.interfaces.interfaces)
+        )...
+    };
+}
+
+constexpr static auto InterfaceDesc =
+    MakeInterfaceDescriptors(
+        std::make_index_sequence<
+            decltype(DEVICE.interfaces.interfaces)::size
+        >{}
+    );
+
+static_assert(sizeof(InterfaceDesc[0]) == 9);
+
+//**************************************СТРОИМ ИНТЕРФЕЙС
+
+// результата для MakeInterface
+template<class IFC, std::size_t N>
+struct InterfaceBlock
+{
+    InterfaceDescriptor_t descriptor;
+    typename IFC::Specific specific;
+    std::array<EPDescriptor_t, N> endpoints;
+};
+//это собирает один интерфейс
+//template<class Tuple, std::size_t
+template<class IFC, std::size_t... I>
+constexpr static auto
+MakeInterface(
+    const IFC& ifc,
+    std::index_sequence<I...>)
+{
+    return InterfaceBlock<IFC, sizeof...(I)>{
+        MakeInterfaceDescriptor(ifc),
+        ifc.specific,
+        MakeInterfaceEndpoints(
+            ifc,
+            std::index_sequence<I...>{}
+        )
+    };
+}
+//это собирает все интерфейсы в последпвательную структуру
+template<class Tuple, std::size_t... I>
+constexpr static auto
+MakeInterfaces(
+    const Tuple& interfaces,
+    std::index_sequence<I...>)
+{
+    return CTuple<
+        decltype(
+            MakeInterface(
+                get<I>(interfaces),
+                std::make_index_sequence<
+                    sizeof(get<I>(interfaces).endpoints.endpoints) /
+                    sizeof(Endpoint)
+                >{}
+            )
+        )...
+    >{
+        MakeInterface(
+            get<I>(interfaces),
+            std::make_index_sequence<
+                sizeof(get<I>(interfaces).endpoints.endpoints) /
+                sizeof(Endpoint)
+            >{}
+        )...
+    };
+}
+
+constexpr static auto InterfaceBlocks =
+    MakeInterfaces(
+        DEVICE.interfaces.interfaces,
+        std::make_index_sequence<
+            decltype(DEVICE.interfaces.interfaces)::size
+        >{}
+    );
+
+struct FullConfigurationDescriptor_t
+{
+    ConfigurationDescriptor_t cd;
+    decltype(InterfaceBlocks) interfaces;
+};
+
+constexpr static FullConfigurationDescriptor_t
+FullConfigurationDescriptor{
+    ConfigurationDescriptor,
+    InterfaceBlocks
+};
+
+
+
+//**********************
 static constexpr uint16_t config_total_len=
 +sizeof(ConfigurationDescriptor_t)
-+CDC_DC.cdc_interfaces.cnt*sizeof(_id0)
++DEVICE.interfaces.cnt*sizeof(InterfaceDesc[0])
 +sizeof(CDCHeaderDescriptor_t)
 +sizeof(CDCACMDescriptor_t)
 +sizeof(CDCCallManagementDescriptor_t)
 +sizeof(CDCUnionDescriptor_t)
-+CDC_DC.cdc_endpoints.cnt*sizeof(_epd3);
++DEVICE.endpoints.cnt*sizeof(EndpointDesc[0]);
 
 static constexpr uint8_t d_cfg_len=sizeof(ConfigurationDescriptor_t);
 	
@@ -615,7 +670,7 @@ inline static constexpr
 		. bDescriptorType=DESC_TYPE_CONFIGURATION,
 		. wTotalLenghtL=config_total_len&0xFF,
 		. wTotalLenghtH=config_total_len>>8,
-		. bNumInterface=CDC_DC.cdc_interfaces.cnt,//число интерфейсов поддерживаемое конфигурацией
+		. bNumInterface=DEVICE.interfaces.cnt,//число интерфейсов поддерживаемое конфигурацией
 		. bConfigurationValue=0x01,//значение используемое SetConfiguration()  для выбора этой конфигурации
 		. iConfiguration=0x00,//индекс строки описывающей конфигурацию
 		. bmAttributes=0x80, //b5-remote wakeup,b6 - self powered
@@ -678,28 +733,33 @@ CDCUnionDescriptor_t CDCUnionDescriptor
     .bSlaveInterface0=0x01       // Номер первого Data Interface
 } ;
 
-inline static constexpr struct{
-	ConfigurationDescriptor_t cd=ConfigurationDescriptor;
-        InterfaceDescriptor_t<
-        CDC_DC.cdc_interfaces.interfaces[0]> id0 =_id0;
-        CDCHeaderDescriptor_t cdc_h=CDCHeaderDescriptor;
-        CDCCallManagementDescriptor_t cdc_callMan=CDCCallManagementDescriptor;
-        CDCACMDescriptor_t cdc_acm=CDCACMDescriptor;
-        CDCUnionDescriptor_t cdc_union=CDCUnionDescriptor;
 
-       EPDescriptor_t<
-       CDC_DC.cdc_endpoints.endoints[0]
-       > epd1=_epd1;
-       InterfaceDescriptor_t<
-      CDC_DC.cdc_interfaces.interfaces[1]
-      > id1=_id1;
-       EPDescriptor_t <
-       CDC_DC.cdc_endpoints.endoints[1]
-        >epd2=_epd2;
-       EPDescriptor_t <
-       CDC_DC.cdc_endpoints.endoints[2]
-       >epd3=_epd3;
-}FullConfigurationDescriptor;
+/* InterfaceDescriptor_t idCommunication;
+        CDCHeaderDescriptor_t cdc_h;
+        CDCCallManagementDescriptor_t cdc_callMan;
+        CDCACMDescriptor_t cdc_acm;
+        CDCUnionDescriptor_t cdc_union;
+        EPDescriptor_t ep_communication;
+
+        InterfaceDescriptor_t idData;
+       
+       EPDescriptor_t ep_data_in;
+       EPDescriptor_t ep_data_out;*/
+
+inline static constexpr struct{
+	ConfigurationDescriptor_t cd=ConfigurationDescriptor,
+        InterfaceDescriptor_t=InterfaceDesc[0],
+        CDCHeaderDescriptor_t cdc_h=CDCHeaderDescriptor,
+        CDCCallManagementDescriptor_t cdc_callMan=CDCCallManagementDescriptor,
+        CDCACMDescriptor_t cdc_acm=CDCACMDescriptor,
+        CDCUnionDescriptor_t cdc_union=CDCUnionDescriptor,
+        EPDescriptor_t ep_communication=EndpointDesc[0],
+
+        InterfaceDescriptor_t idData=InterfaceDesc[0],
+        EPDescriptor_t ep_data_in=EndpointDesc[1],
+        EPDescriptor_t ep_data_out=EndpointDesc[2]
+    
+}FullConfigurationDescriptor{};
 
 
 #define LANG_ID               0x00
@@ -738,7 +798,8 @@ static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 
         uint8_t byte_left= buf_sz>host_await_sz?host_await_sz:buf_sz;
         uint8_t* data_begin=buf;
-
+uint8_t dbg_buf[64];
+memcpy(dbg_buf,buf,buf_sz);
 
         while(byte_left>=EP0_SZ){
           uint8_t byte_to_transfer=EP0_SZ;      
@@ -751,16 +812,19 @@ static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 	}
         //0<byte_left<EP0_SZ
         while( MAP_USBEndpointDataPut(USB0_BASE,USB_EP_0,data_begin,byte_left)==-1){;};
+        //uint32_t cnt = HWREGB(USB0_BASE + USB_O_COUNT0);
         while( MAP_USBEndpointDataSend(USB0_BASE,USB_EP_0,USB_TRANS_IN_LAST)==-1){;};
 }
-
- bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t index=0){
+public:
+static bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t index=0){
 
 		switch(desc_type){
 
 			case DESC_TYPE_DEVICE:
 
 			SetUpAnswer((uint8_t*)&DeviceDescriptor,sizeof(DeviceDescriptor),host_await_sz);
+
+
                         return true;
 
 			case DESC_TYPE_CONFIGURATION:{
@@ -785,7 +849,7 @@ static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 		}
 return false;
  }   
-
+private:
 static bool string(uint8_t index ,uint8_t host_await_sz){
     switch (index){
     case 0:

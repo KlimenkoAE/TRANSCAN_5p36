@@ -458,10 +458,26 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   ../StellarisWare/driverlib/usb.h ../StellarisWare/driverlib/timer.h \
   ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
   ../StellarisWare/driverlib/rom_map.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
   ../StellarisWare/inc/hw_memmap.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/utility \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/rel_ops.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/as_const.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/cmp.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/forward_like.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/to_underlying.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_log2.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_width.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/endian.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/has_single_bit.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/byteswap.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   ../StellarisWare/driverlib/interrupt.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
@@ -642,4 +658,7 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalISR.hpp \
-  ../StellarisWare/inc/hw_uart.h
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
+  ../StellarisWare/inc/hw_ints.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdbool \
+  ../StellarisWare/inc/hw_uart.h ../StellarisWare/inc/lm3s5p36.h

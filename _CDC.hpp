@@ -15,6 +15,7 @@ extern "C"{
 #include "rom.h"
 #include "rom_map.h"
 }
+#include "periferalInterruptsHandlers.hpp"
 #include "USB_THIS_PROGRAM_DEFS.hpp"
 typedef enum
 {
@@ -90,11 +91,19 @@ public:
         ,TIMER_TX_INT_FLAG(timer_tx_f)
         ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
     {
-
+   USB_COM_Handlers<INIT.USB_BASE>::Register(INIT.DATA_IN_EP ,[this](){
+  TX_InterrupHandler();
+  });
+   USB_COM_Handlers<INIT.USB_BASE>::Register(INIT.DATA_OUT_EP ,[this](){
+  RX_InterrupHandler();
+  });
+   USB_COM_Handlers<INIT.USB_BASE>::Register(INIT.COMMUNICATION_EP ,[this](){
+  Communication_InterrupHandler();
+  });
     // принимаем host status line
     ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf, uint32_t sup_data ){
+    [this](const _Buffer& su_buf, uint32_t& sup_data ){
                             this->TraceHostStatus(su_buf.wValue);
                             },
                             USB_CDC_SET_CONTROL_LINE_STATE,
@@ -104,7 +113,7 @@ public:
     //принимаем LineCoding от Hosta
  ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
                  memcpy(this->LineCoding.arr, buffer.arr, sup_data);
                             },
                             USB_CDC_SET_LINE_CODING,
@@ -114,7 +123,7 @@ public:
 
  ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
                 MAP_USBEndpointDataPut(INIT.USB_BASE, USB_EP_0,
                                        (uint8_t *)this->LineCoding.arr,sizeof(this->LineCoding.arr));
                 MAP_USBEndpointDataSend(INIT.USB_BASE,USB_EP_0,USB_TRANS_IN_LAST);
@@ -126,7 +135,15 @@ public:
 
  ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
+    	if((enum _device_state)sup_data== _device_state::Configurated){
+                Flags.all=0;
+                MAP_USBFIFOFlush(INIT.USB_BASE, INIT.COMMUNICATION_EP , USB_EP_DEV_IN);
+                MAP_USBFIFOFlush(INIT.USB_BASE, INIT.DATA_IN_EP, USB_EP_DEV_IN);
+                MAP_USBFIFOFlush(INIT.USB_BASE, INIT.DATA_OUT_EP, USB_EP_DEV_OUT);
+               sup_data=(uint32_t)_device_state::Default;
+                }	
+               set_usb_cfg();
                Flags.DATA_IN_ON=false;
                             },
                             SET_CONFIGURATION,
@@ -136,7 +153,7 @@ public:
 
      ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
                               Flags.COMMUNICATION_BUSY = false; 
                               Flags.COMMUNICATION_INT=false;
                             },
@@ -145,7 +162,7 @@ public:
     );
          ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
                               fr_TX.clear();
                               Flags.DATA_IN_BUSY = false; 
                               Flags.DATA_IN_INT=false;
@@ -157,7 +174,7 @@ public:
     );
          ExtSetupHandlerRegister
     (
-    [this](const _Buffer& su_buf,uint32_t sup_data){
+    [this](const _Buffer& su_buf,uint32_t& sup_data){
                               fr_RX.clear();
                               Flags.DATA_OUT_BUSY = false; 
                               Flags.DATA_OUT_INT=false;
@@ -166,10 +183,14 @@ public:
                             CDC_INIT.DATA_OUT_EP_ADDR
     );
 
-
-  }
+}//constructor
                            
+void set_usb_cfg() {
+unsigned long ep_config[1];
+unsigned long max_pak_sz[1];
+unsigned long ep_status;
 
+}
 ///////
 void Send_Device_State(CDC_SerialState_t b8)
 {

@@ -51,7 +51,7 @@ constexpr unsigned EPIndex(uint32_t m)//плучаем номер младшег
 
 template<uint32_t usb_base>//usb_base
 class USB_COM_Handlers{
-
+public:
 inline static  std::function<void()> handlers[30];
 
 static  void Execute(uint32_t int_COM_status){
@@ -70,7 +70,7 @@ static  void Execute(uint32_t int_COM_status){
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-std::array<uint32_t,ExtSetupHandlersCnt> T1= {
+inline std::array<uint32_t,ExtSetupHandlersCnt> T1= {
     GET_STATUS_DEVICE<<8|0x00,      
     GET_STATUS_INTERF<<8|0x00,    
    GET_STATUS_ENDPNT<<8|0x05,  
@@ -128,10 +128,13 @@ std::array<uint32_t,ExtSetupHandlersCnt> T1= {
      SET_IDLE<<8|0x00,               
      FEAT_ENDPOINT_HALT<<8|0x00,        
      FEAT_DEVICE_REMOTE_WAKEUP<<8|0x00, 
-     FEAT_TEST_MODE<<8|0x00            
+     FEAT_TEST_MODE<<8|0x00, 
+     USB_CDC_SET_LINE_CODING<<8|0,          //0x2021
+     USB_CDC_GET_LINE_CODING<<8|0,          //0x21A1
+     USB_CDC_SET_CONTROL_LINE_STATE<<8|0   //0x2221           
 };
 
-std::function<void( const _Buffer&, uint32_t sup_data)> ExtSetupHandlers[ExtSetupHandlersCnt];
+inline   std::function<void( const _Buffer&, uint32_t& sup_data)> ExtSetupHandlers[ExtSetupHandlersCnt];
 
 
 template <size_t N>
@@ -146,7 +149,7 @@ constexpr uint8_t GetIndex(uint32_t val, const std::array<uint32_t, N>& array)
    std::unreachable();
 }
 
-inline void ExtSetupHandlerRegister(std::function<void(const _Buffer&, uint32_t)> h,
+inline void ExtSetupHandlerRegister(std::function<void(const _Buffer&, uint32_t&)> h,
                                     uint32_t req,
                                     uint8_t ep_addr=0
                                     )
@@ -154,7 +157,8 @@ inline void ExtSetupHandlerRegister(std::function<void(const _Buffer&, uint32_t)
     ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)] = std::move(h);
 }
 
-inline bool Execute_ExtSetupHandler(uint32_t req, uint8_t ep_addr=0,const _Buffer& buf={0,0,0,0,0,0,0,0},uint32_t sup_data=0)
+inline uint32_t dammyobj;
+inline bool Execute_ExtSetupHandler(uint32_t req, uint8_t ep_addr=0,const _Buffer& buf={0,0,0,0,0,0,0,0},uint32_t& sup_data=dammyobj)
 {
     auto& h = ExtSetupHandlers[GetIndex((req << 8) | ep_addr, T1)];
     if (!h)

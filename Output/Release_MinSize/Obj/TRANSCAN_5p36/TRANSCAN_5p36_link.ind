@@ -1,0 +1,13 @@
+Output/Release_MinSize/Obj/TRANSCAN_5p36/Cortex_M_Startup.o
+Output/Release_MinSize/Obj/TRANSCAN_5p36/SEGGER_THUMB_Startup.o
+../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/libcxx_noexcept_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/libc_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/SEGGER_crtinit_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/prinops_semihost_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/prinops_semihostformatted_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/heapops_minimal_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/heapops_disable_interrupts_locking_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/strops_unaligned_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/mbops_timeops_minimal_locale_v7m_t_le_eabi_small.a
+/opt/SEGGER/segger_embedded_studio_8.28a/lib/libcxxabi_noexcept_v7m_t_le_eabi_small.a

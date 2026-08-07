@@ -32,9 +32,91 @@ constexpr uint8_t SELF_POWRED =1;
 
 constexpr uint8_t STATUS_DEVICE[2]= {(REMOTE_WAKEUP<<1)|(SELF_POWRED),0 };
 
-constexpr USB_Endpoins<3> CDC_endpoints={
+
+
+
+
+constexpr CDC_DEVICE_CLASS_t CDC_DEVICE_CLASS{
+    .vid = 0x0547,
+    .pid = 0x1002,
+
+    .interfaces = {
+        .interfaces = {
+            {
+                    .number    = 0,
+                    .i_class   = 0x02,
+                    .sub_class = 0x02,
+                    .protocol  = 0x01,
+
+                    .specific = {
+                        .value = USB_DescriptorTypes::CDCHeaderDescriptor_t{
+                              5, 0x24, 0x00, 0x10, 0x01
+                          },
+
+                      .rest = {
+                          .value = USB_DescriptorTypes::CDCCallManagementDescriptor_t{
+                              5, 0x24, 0x01, 0x01, 1
+                          },
+
+                      .rest = {
+                          .value = USB_DescriptorTypes::CDCACMDescriptor_t{
+                              4, 0x24, 0x02, 0x02
+                          },
+
+                      .rest = {
+                          .value = USB_DescriptorTypes::CDCUnionDescriptor_t{
+                              5, 0x24, 0x06, 0, 1
+                          }
+            }
+        }
+    }
+                    },
+
+                    .endpoints = {
+                        .cnt = 1,
+                        .endpoints = {{
+                            CDC0_COMMUNICATION_EP_ADDR,
+                            EP_CONTROL,
+                            CDC0_COMMUNICFTION_EP_SZ,
+                            0x01
+                        }}
+                    }
+            },
+
+            {
+                .value = {
+                    .number    = 1,
+                    .i_class   = 0x0A,
+                    .sub_class = 0,
+                    .protocol  = 0,
+
+                    .specific = {},
+
+                    .endpoints = {
+                        .cnt = 2,
+                        .endpoints = {{
+                            CDC0_DATA_IN_EP_ADDR,
+                            EP_BULK,
+                            CDC0_DATA_IN_EP_SZ,
+                            0x01
+                        }, {
+                            CDC0_DATA_OUT_EP_ADDR,
+                            EP_BULK,
+                            CDC0_DATA_OUT_EP_SZ,
+                            0x01
+                        }}
+                    }
+                }
+            }
+        }
+    }
+};
+  
+
+
+/*constexpr USB_Endpoins<3> CDC_endpoints={
 .cnt=3,
-.endoints=
+.endpoints=
   {
     {
     CDC0_COMMUNICATION_EP_ADDR,
@@ -83,9 +165,9 @@ constexpr USB_Interfaces<2> CDC_interfaces{
 static constexpr CDC_DEVICE_CLASS_t CDC_DEVICE_CLASS={
 .vid=0x0547,
 .pid=0x1002,
-.cdc_interfaces=CDC_interfaces,
-.cdc_endpoints=CDC_endpoints
-};
+.interfaces=CDC_interfaces,
+.endpoints=CDC_endpoints
+};*/
 
 
 
@@ -112,7 +194,7 @@ constexpr  CDC_INIT_t CDC_INIT={
 
 
 
-constexpr uint8_t ExtSetupHandlersCnt=52;
+constexpr uint8_t ExtSetupHandlersCnt=55;
 
 
 /////ЭТО ВСЕ ЗДЕСЬ ВРЕМЕННО

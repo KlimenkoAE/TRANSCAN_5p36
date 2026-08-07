@@ -72,6 +72,14 @@
 #define EP_OUT(n) (0x0##n)
 
 
+#define USB_CSRL0    (0x102)
+#define USB_CSRH0    (0x103)
+#define USB_TXCSRL1  (0x106)
+#define USB_TXCSRH1  (0x107)
+#define USB_RXCSRL1  (0x10A)
+#define USB_RXCSRH1  (0x10B)
+
+
 
 
 
