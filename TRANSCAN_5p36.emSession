@@ -1,23 +1,21 @@
 <!DOCTYPE CrossStudio_Session_File>
 <session>
  <Bookmarks>
+  <BookmarkItem objectName="" line="329" column="18" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="2" extra="uart_print_d(&quot;SETUP ROUTINE COMMAND NO HANDLE, STALL/n&quot;);" color="5"/>
   <BookmarkItem objectName="" line="103" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_CDC.hpp" number="1" extra="ExtSetupHandlerRegister(std::function&lt;void()> =[this](){" color="5"/>
   <BookmarkItem objectName="" line="305" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_CDC.hpp" number="1" extra="uint8_t rx_buf[DATA_OUT_EP_SZ];" color="5"/>
   <BookmarkItem objectName="" line="340" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_USB.hpp" number="4" extra="break;" color="5"/>
   <BookmarkItem objectName="" line="441" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_USB.hpp" number="1" extra="while( MAP_USBEndpointDataPut(usb_base,USB_EP_0,data_begin,byte_left)==-1){;};" color="5"/>
   <BookmarkItem objectName="" line="505" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_USB.hpp" number="1" extra="static_assert(sizeof(DeviceDescriptor) == 18," color="5"/>
-  <BookmarkItem objectName="" line="783" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_USB.hpp" number="3" extra="bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t index=0){" color="5"/>
+  <BookmarkItem objectName="" line="827" column="0" path="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36/_USB.hpp" number="3" extra="bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t index=0){" color="5"/>
   <BookmarkItem objectName="" line="42" column="0" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="1" extra="MAP_USBDevEndpointConfigSet(USB0_BASE, USB_EP_1,1023,USB_EP_MODE_ISOC|USB_EP_DEV_IN|/*USB_EP_AUTO_SET|USB_EP_AUTO_CLEAR|DISABLE_NAK_LIMIT|*/USB_EP_DMA_MODE_0);" color="5"/>
   <BookmarkItem objectName="" line="146" column="0" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="3" extra="" color="5"/>
-  <BookmarkItem objectName="" line="329" column="18" path="E:/documents/SEGGER Embedded Studio Projects/Osciloscope/LM3SP5/Source/usb_setup.c" number="2" extra="uart_print_d(&quot;SETUP ROUTINE COMMAND NO HANDLE, STALL/n&quot;);" color="5"/>
  </Bookmarks>
  <Breakpoints groups="Breakpoints" active_group="Breakpoints">
   <BreakpointListItem trigger="" line="132" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" stopAll="false" group="Breakpoints" type="Breakpoint" state="2" filename="main.cpp" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="70" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" stopAll="false" group="Breakpoints" type="Breakpoint" state="2" filename="main.cpp" useHWbreakpoint="false"/>
   <BreakpointListItem trigger="" line="286" counter="0" hardwareBreakpoint="" isFunctionBreakpoint="false" action="" expression="" stopAll="false" group="Breakpoints" type="Breakpoint" state="2" filename="USB_CLASSES.hpp" useHWbreakpoint="false"/>
-  <Exceptions>
-   <Group group="V7M Exceptions" set="BusFault;ExceptionEntryReturnFault;HardFault;MemManage;UsageFault_CheckingError;UsageFault_Coprocessor;UsageFault_StateError"/>
-  </Exceptions>
+  <Exceptions/>
  </Breakpoints>
  <ExecutionProfileWindow/>
  <FrameBuffer>
@@ -125,17 +123,17 @@
   </Watches>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="21" y="581" useTextEdit="1" path="_USB.hpp" left="0" selected="1" top="574" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="42" y="758" useTextEdit="1" path="_USB.hpp" left="0" selected="1" top="750" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="63" useTextEdit="1" path="_TIMERS.hpp" left="0" top="40" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="56" y="1889" useTextEdit="1" path="../StellarisWare/inc/hw_usb.h" left="0" top="1876" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="23" y="59" useTextEdit="1" folds0="105,115,155,164,176" path="_CDC.hpp" left="0" top="49" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="23" y="34" useTextEdit="1" path="USB_CONSTS.hpp" left="0" top="22" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="102" y="136" useTextEdit="1" path="periferalInterruptsHandlers.hpp" left="0" top="128" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="52" useTextEdit="1" folds0="116" path="USB_THIS_PROGRAM_DEFS.hpp" left="0" top="58" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="17" y="52" useTextEdit="1" folds0="116" path="USB_THIS_PROGRAM_DEFS.hpp" left="0" top="52" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="16" y="106" useTextEdit="1" path="../StellarisWare/inc/hw_ints.h" left="0" top="97" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="14" y="220" useTextEdit="1" path="USB_CLASSES.hpp" left="0" top="213" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="40" y="276" useTextEdit="1" path="/opt/SEGGER/segger_embedded_studio_8.28a/include/stdint.h" left="0" top="262" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="132" useTextEdit="1" path="main.cpp" left="0" top="95" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="132" useTextEdit="1" path="main.cpp" left="0" top="109" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="12" y="0" useTextEdit="1" path="periferalISR.hpp" left="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="28" y="46" useTextEdit="1" path="periferalISR.cpp" left="0" top="29" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="17" y="57" useTextEdit="1" path="_TIMERS.cpp" left="0" top="42" codecName="Default"/>
@@ -146,8 +144,8 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="12" y="66" useTextEdit="1" path="../StellarisWare/inc/hw_types.h" left="0" top="53" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2943" useTextEdit="1" path="../StellarisWare/driverlib/usb.c" left="0" top="2922" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="148" useTextEdit="1" path="/opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/invoke.h" left="0" top="135" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="151" useTextEdit="1" path="MyTuples.hpp" left="0" top="128" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="52" y="151" useTextEdit="1" path="MyTuples.hpp" left="0" top="130" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="2" useTextEdit="1" path="_UCB.cpp" left="0" top="0" codecName="Default"/>
  </Files>
- <EMStudioWindow activeProject="TRANSCAN_5p36" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <EMStudioWindow activeProject="TRANSCAN_5p36" fileDialogDefaultFilter="*" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="" fileDialogInitialDirectory="/home/Andrew/Documents/SEGGER Embedded Studio Projects/TRANSCAN_5p36" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

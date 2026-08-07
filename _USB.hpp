@@ -509,7 +509,7 @@ static_assert(sizeof(DeviceDescriptor) == 18,
 
 //constexpr static InterfaceDescriptor_t<> interfaceces_descs[CDC_DC.cdc_interfaces.cnt]=
 
-constexpr static InterfaceDescriptor_t
+/*constexpr static InterfaceDescriptor_t
 MakeInterfaceDescriptor(const auto& ifc)
 {
     return {
@@ -523,8 +523,25 @@ MakeInterfaceDescriptor(const auto& ifc)
         ifc.protocol,
         0
     };
-}
+}*/
 
+
+template<class Specific, uint8_t N>
+constexpr static InterfaceDescriptor_t
+MakeInterfaceDescriptor(const newIFC<Specific, N>& ifc)
+{
+    return {
+        9,
+        DESC_TYPE_INTERFACE,
+        ifc.number,
+        0,
+        N,                 // bNumEndpoints
+        ifc.i_class,
+        ifc.sub_class,
+        ifc.protocol,
+        0
+    };
+}
 //ENDPOINT DESCS
 constexpr static EPDescriptor_t
 MakeEndpointDescriptor(const Endpoint& ep)
@@ -566,6 +583,24 @@ MakeInterfaceDescriptors(std::index_sequence<I...>)
     };
 }
 
+/*constexpr static auto TestInterface =
+    MakeInterfaceDescriptor(
+        get<0>(DEVICE.interfaces.interfaces)
+    );
+
+static_assert(TestInterface.bLength == 9);
+static_assert(TestInterface.bDescriptorType == DESC_TYPE_INTERFACE);
+static_assert(TestInterface.bInterfaceNumber == 0);
+static_assert(TestInterface.bNumEndpoints == 1);//1
+
+constexpr static auto TestInterface1 =
+    MakeInterfaceDescriptor(
+        get<1>(DEVICE.interfaces.interfaces)
+    );
+
+static_assert(TestInterface1.bInterfaceNumber == 1);//1
+static_assert(TestInterface1.bNumEndpoints == 2);//2*/
+
 constexpr static auto InterfaceDesc =
     MakeInterfaceDescriptors(
         std::make_index_sequence<
@@ -575,19 +610,37 @@ constexpr static auto InterfaceDesc =
 
 static_assert(sizeof(InterfaceDesc[0]) == 9);
 
+
+/*
+constexpr static auto TestEndpoints =
+    MakeInterfaceEndpointDescriptors(
+        get<0>(DEVICE.interfaces.interfaces),
+        std::make_index_sequence<1>{}
+    );
+static_assert(false, "TEST STATIC ASSERT");
+static_assert(TestEndpoints.size() == 1);
+static_assert(TestEndpoints[0].EndpointAddress == CDC0_COMMUNICATION_EP_ADDR+1);
+static_assert(TestEndpoints[0].bLength == 80);//7*/
+
+
+
+
+
 //**************************************СТРОИМ ИНТЕРФЕЙС
 
 // результата для MakeInterface
-template<class IFC, std::size_t N>
+template<class Specific,class IFC, std::size_t N>
 struct InterfaceBlock
 {
     InterfaceDescriptor_t descriptor;
-    typename IFC::Specific specific;
+    Specific specific;
     std::array<EPDescriptor_t, N> endpoints;
 };
+
+
 //это собирает один интерфейс
 //template<class Tuple, std::size_t
-template<class IFC, std::size_t... I>
+/*template<class IFC, std::size_t... I>
 constexpr static auto
 MakeInterface(
     const IFC& ifc,
@@ -595,8 +648,49 @@ MakeInterface(
 {
     return InterfaceBlock<IFC, sizeof...(I)>{
         MakeInterfaceDescriptor(ifc),
+        Specific,
+        MakeInterfaceEndpointDescriptors(
+            ifc,
+            std::index_sequence<I...>{}
+        )
+    };
+}
+*/
+/*template<class Specific, class IFC, std::size_t... I>
+constexpr static auto
+MakeInterface(
+    const IFC& ifc,
+    std::index_sequence<I...>)
+{
+    return InterfaceBlock<
+        Specific,
+        IFC,
+        sizeof...(I)
+    >{
+        MakeInterfaceDescriptor(ifc),
         ifc.specific,
-        MakeInterfaceEndpoints(
+        MakeInterfaceEndpointDescriptors(
+            ifc,
+            std::index_sequence<I...>{}
+        )
+    };
+}*/
+
+
+template<class Specific, uint8_t N, std::size_t... I>
+constexpr static auto
+MakeInterface(
+    const newIFC<Specific, N>& ifc,
+    std::index_sequence<I...>)
+{
+    return InterfaceBlock<
+        Specific,
+        newIFC<Specific, N>,
+        sizeof...(I)
+    >{
+        MakeInterfaceDescriptor(ifc),
+        ifc.specific,
+        MakeInterfaceEndpointDescriptors(
             ifc,
             std::index_sequence<I...>{}
         )
@@ -638,39 +732,53 @@ constexpr static auto InterfaceBlocks =
         >{}
     );
 
+static_assert(
+    decltype(InterfaceBlocks)::size == 2
+);
+constexpr static auto InterfaceCount =
+    decltype(InterfaceBlocks)::size;
+
 struct FullConfigurationDescriptor_t
 {
     ConfigurationDescriptor_t cd;
     decltype(InterfaceBlocks) interfaces;
 };
 
-constexpr static FullConfigurationDescriptor_t
-FullConfigurationDescriptor{
-    ConfigurationDescriptor,
-    InterfaceBlocks
-};
 
 
 
-//**********************
-static constexpr uint16_t config_total_len=
-+sizeof(ConfigurationDescriptor_t)
-+DEVICE.interfaces.cnt*sizeof(InterfaceDesc[0])
-+sizeof(CDCHeaderDescriptor_t)
-+sizeof(CDCACMDescriptor_t)
-+sizeof(CDCCallManagementDescriptor_t)
-+sizeof(CDCUnionDescriptor_t)
-+DEVICE.endpoints.cnt*sizeof(EndpointDesc[0]);
+
+////configure total size
+template<class Tuple, std::size_t... I>
+constexpr static std::size_t
+GetInterfacesSize(
+    const Tuple& interfaces,
+    std::index_sequence<I...>)
+{
+    return (sizeof(get<I>(interfaces)) + ...);
+}
+
+constexpr static auto config_total_len =
+    sizeof(ConfigurationDescriptor_t) +
+    GetInterfacesSize(
+        InterfaceBlocks,
+        std::make_index_sequence<
+            decltype(InterfaceBlocks)::size
+        >{}
+    );
+
+
 
 static constexpr uint8_t d_cfg_len=sizeof(ConfigurationDescriptor_t);
+
 	
 inline static constexpr
  ConfigurationDescriptor_t ConfigurationDescriptor={//ConfigurationDescriptor
 		. bLength=d_cfg_len,
 		. bDescriptorType=DESC_TYPE_CONFIGURATION,
-		. wTotalLenghtL=config_total_len&0xFF,
-		. wTotalLenghtH=config_total_len>>8,
-		. bNumInterface=DEVICE.interfaces.cnt,//число интерфейсов поддерживаемое конфигурацией
+		. wTotalLenghtL=static_cast<uint8_t>(config_total_len&0xFF),
+		. wTotalLenghtH=static_cast<uint8_t>(config_total_len>>8),
+		. bNumInterface=InterfaceCount,//число интерфейсов поддерживаемое конфигурацией
 		. bConfigurationValue=0x01,//значение используемое SetConfiguration()  для выбора этой конфигурации
 		. iConfiguration=0x00,//индекс строки описывающей конфигурацию
 		. bmAttributes=0x80, //b5-remote wakeup,b6 - self powered
@@ -682,7 +790,7 @@ inline static constexpr
 
 
 //////////////////////////CDC
-
+/*
 inline static constexpr
 CDCHeaderDescriptor_t CDCHeaderDescriptor=
 {//CDCHeaderDescriptor
@@ -732,7 +840,7 @@ CDCUnionDescriptor_t CDCUnionDescriptor
 
     .bSlaveInterface0=0x01       // Номер первого Data Interface
 } ;
-
+*/
 
 /* InterfaceDescriptor_t idCommunication;
         CDCHeaderDescriptor_t cdc_h;
@@ -747,17 +855,8 @@ CDCUnionDescriptor_t CDCUnionDescriptor
        EPDescriptor_t ep_data_out;*/
 
 inline static constexpr struct{
-	ConfigurationDescriptor_t cd=ConfigurationDescriptor,
-        InterfaceDescriptor_t=InterfaceDesc[0],
-        CDCHeaderDescriptor_t cdc_h=CDCHeaderDescriptor,
-        CDCCallManagementDescriptor_t cdc_callMan=CDCCallManagementDescriptor,
-        CDCACMDescriptor_t cdc_acm=CDCACMDescriptor,
-        CDCUnionDescriptor_t cdc_union=CDCUnionDescriptor,
-        EPDescriptor_t ep_communication=EndpointDesc[0],
-
-        InterfaceDescriptor_t idData=InterfaceDesc[0],
-        EPDescriptor_t ep_data_in=EndpointDesc[1],
-        EPDescriptor_t ep_data_out=EndpointDesc[2]
+	ConfigurationDescriptor_t cd=ConfigurationDescriptor;
+        decltype(InterfaceBlocks) interfaces = InterfaceBlocks;
     
 }FullConfigurationDescriptor{};
 
