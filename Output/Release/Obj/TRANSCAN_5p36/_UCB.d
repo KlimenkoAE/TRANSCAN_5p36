@@ -7,7 +7,7 @@ Output/Release/Obj/TRANSCAN_5p36/_UCB.o: \
   ../StellarisWare/driverlib/rom.h ../StellarisWare/driverlib/rom_map.h \
   ../StellarisWare/inc/hw_memmap.h \
   ../StellarisWare/driverlib/interrupt.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdint \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config_site \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/abi.h \
@@ -15,12 +15,14 @@ Output/Release/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/platform.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/availability.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/language.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdint.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdint.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_ConfDefaults.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Conf.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Arm_Conf.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdint \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdint.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdint.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdbool \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/functional \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/binary_function.h \
@@ -378,8 +380,6 @@ Output/Release/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/search.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/find_first_of.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdio \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/iosfwd \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/fstream.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/ios.h \
@@ -639,6 +639,13 @@ Output/Release/Obj/TRANSCAN_5p36/_UCB.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/utility \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/rel_ops.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/as_const.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/cmp.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/forward_like.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/to_underlying.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \

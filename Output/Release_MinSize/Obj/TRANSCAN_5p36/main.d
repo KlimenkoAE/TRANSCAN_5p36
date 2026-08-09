@@ -463,6 +463,16 @@ Output/Release_MinSize/Obj/TRANSCAN_5p36/main.bc: \
   ../StellarisWare/inc/hw_memmap.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/utility \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/rel_ops.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/as_const.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/cmp.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/forward_like.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/to_underlying.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisWareWrap.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
@@ -649,9 +659,8 @@ Output/Release_MinSize/Obj/TRANSCAN_5p36/main.bc: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_ends_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_starts_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalISR.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
   ../StellarisWare/inc/hw_ints.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdbool \
-  ../StellarisWare/inc/hw_uart.h
+  ../StellarisWare/inc/hw_uart.h ../StellarisWare/inc/lm3s5p36.h

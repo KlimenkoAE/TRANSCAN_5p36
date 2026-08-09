@@ -214,10 +214,11 @@ uint8_t cnt;
 IFC interfaces[N];
 };
 
-
-
 template<class Specific, uint8_t N>
-struct newIFC {
+struct newIFC
+{
+    using SpecificType = Specific;
+
     uint8_t number;
     uint8_t i_class;
     uint8_t sub_class;

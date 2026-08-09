@@ -189,6 +189,51 @@ void set_usb_cfg() {
 unsigned long ep_config[1];
 unsigned long max_pak_sz[1];
 unsigned long ep_status;
+/*
+
+USB0_EPIDX_R=1;
+
+  MAP_USBDevEndpointConfigSet(USB0_BASE, USB_EP_1,16,USB_EP_MODE_INT|USB_EP_DEV_IN/*|USB_EP_AUTO_SET|USB_EP_DMA_MODE_0*//*);
+  USB0_TXMAXP1_R=16;
+//ep0-sz64
+  MAP_USBFIFOConfigSet(USB0_BASE, USB_EP_1, 64, USB_FIFO_SZ_16, USB_EP_DEV_IN);
+
+//while(!(USB0_TXCSRH1_R&USB_TXCSRH1_DMAEN));
+
+MAP_USBIntEnableEndpoint(USB0_BASE,USB_INTEP_DEV_IN_1);
+////////////////////
+USB0_EPIDX_R=2;
+//ep0 64 +ep1 8*2=80
+//USBDevEndpointConfigSet(USB0_BASE, USB_EP_1, 64, DISABLE_NAK_LIMIT,
+//USB_EP_MODE_BULK | USB_EP_DEV_IN);
+  MAP_USBDevEndpointConfigSet(USB0_BASE, USB_EP_2,64,USB_EP_MODE_BULK|USB_EP_DEV_IN/*|USB_EP_AUTO_SET|USB_EP_DMA_MODE_0*//*);
+  USB0_TXMAXP2_R=64;
+
+  MAP_USBFIFOConfigSet(USB0_BASE, USB_EP_2, 80, USB_FIFO_SZ_64_DB, USB_EP_DEV_IN);
+
+//while(!(USB0_TXCSRH2_R&USB_TXCSRH2_DMAEN));
+MAP_USBIntEnableEndpoint(USB0_BASE,USB_INTEP_DEV_IN_2);
+/////////////
+USB0_EPIDX_R=2;
+
+  MAP_USBDevEndpointConfigSet(USB0_BASE, USB_EP_2,64,USB_EP_MODE_BULK|USB_EP_DEV_OUT/*|USB_EP_AUTO_SET|USB_EP_DMA_MODE_0*//*);
+  USB0_RXMAXP2_R=64;
+//ep0=64+ep1=8*2+64*2=208
+  MAP_USBFIFOConfigSet(USB0_BASE, USB_EP_2,208, USB_FIFO_SZ_64_DB, USB_EP_DEV_OUT);
+//while(!(USB0_RXCSRH3_R&USB_RXCSRH3_DMAEN));
+MAP_USBIntEnableEndpoint(USB0_BASE,USB_INTEP_DEV_OUT_2);
+
+MAP_USBIntEnableEndpoint(USB0_BASE,
+    USB_INTEP_DEV_IN_2 | USB_INTEP_DEV_OUT_2 | USB_INTEP_DEV_IN_1 | USB_INT_EP0);
+
+//DMA_Start();
+
+device_state=Configurated;
+CDC_Host_Curr_State = 0;
+CDC_Dev_Curr_State = CDC_SS_DCD; // только присутствие
+print_d(__FUNCTION__,'\n');
+*/
+  return;
 
 }
 ///////

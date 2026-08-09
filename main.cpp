@@ -16,7 +16,7 @@ extern "C"{
 #include "lm3s5p36.h"
  }
 
-extern "C" void CPUcpsie(void)
+/*extern "C" void CPUcpsie(void)
 {
     __asm volatile("cpsie i");
 }
@@ -25,9 +25,10 @@ extern "C" void CPUcpsid(void)
 {
     __asm volatile("cpsid i");
 }
+*/
+
 volatile const char *gAssertFile;
 volatile unsigned long gAssertLine;
-
 extern "C"
 void __error__(char *pcFilename, unsigned long ulLine)
 {
@@ -39,7 +40,7 @@ void __error__(char *pcFilename, unsigned long ulLine)
         __asm volatile ("nop");
     }
 }
-
+/*
 extern "C" void HardFault_HandlerC(uint32_t *sp);
 
 extern "C"
@@ -68,7 +69,7 @@ void HardFault_HandlerC(uint32_t *sp)
     HF_CFSR = NVIC_FAULT_STAT_R;
 
     while (1);
-}
+}*/
 /*extern "C"{
 
 volatile uint32_t HF_HFSR;
@@ -106,7 +107,7 @@ uint32_t dbg = SysCtlClockGet();
 
   //common timer us
   /////////////////
- /* TimerPeriodic_us<
+  TimerPeriodic_us<
   TIMER0_BASE
   ,TIMER_CFG_32_BIT_PER
   , SYSCTL_PERIPH_TIMER0
@@ -115,13 +116,9 @@ uint32_t dbg = SysCtlClockGet();
   ,1
   ,10,100,1000,10000,100000,1000000> T_us;
 
+T_us.Disable();
 
 
-  //cdc 0
-  CDC
-  <
-  CDC_INIT   
-  > CDC0(T_us.IntFlag(0),T_us.IntFlag(5));*/
 
   USB<USB0_BASE,
   INT_USB0,//INT_USB0
@@ -129,7 +126,21 @@ uint32_t dbg = SysCtlClockGet();
   CDC_DEVICE_CLASS //
   >USB0;
 
+  //cdc 0
+  CDC
+  <
+  CDC_INIT   
+  > CDC0(T_us.IntFlag(0),T_us.IntFlag(5));
+
+
+
+
+
   MAP_IntMasterEnable();
+
+
+
+
 
   while(1) {
 

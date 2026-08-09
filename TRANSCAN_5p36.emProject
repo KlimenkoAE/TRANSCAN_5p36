@@ -80,23 +80,22 @@
       <file file_name="periferalInterruptsHandlers.hpp" />
       <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
+      <file file_name="StellarisWareWrap.hpp" />
       <file file_name="USB_CLASSES.hpp" />
       <file file_name="USB_CONSTS.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
+      <file file_name="VENDOR_CONSTANT_WRAP.hpp" />
     </folder>
     <folder Name="Setup" />
     <folder Name="Source">
       <file file_name="_TIMERS.cpp" />
       <file file_name="_UCB.cpp" />
-      <file file_name="../StellarisWare/driverlib/interrupt.c" />
       <file file_name="main.cpp">
         <configuration
           Name="Common"
           c_user_include_directories=".;../StellarisWare;../StellarisWare/inc" />
       </file>
       <file file_name="periferalISR.cpp" />
-      <file file_name="../StellarisWare/driverlib/sysctl.c" />
-      <file file_name="../StellarisWare/driverlib/timer.c" />
       <file file_name="../StellarisWare/driverlib/usb.c" />
     </folder>
     <folder Name="System">
@@ -104,5 +103,6 @@
       <file file_name="System/Cortex_M_Startup.s" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>
