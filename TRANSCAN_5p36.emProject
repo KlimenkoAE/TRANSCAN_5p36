@@ -75,16 +75,18 @@
       <file file_name="_CDC.hpp" />
       <file file_name="_TIMERS.hpp" />
       <file file_name="_USB.hpp" />
+      <file file_name="BackEnd.hpp" />
       <file file_name="fifo_ring.hpp" />
       <file file_name="MyTuples.hpp" />
       <file file_name="periferalInterruptsHandlers.hpp" />
       <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
-      <file file_name="StellarisWareWrap.hpp" />
       <file file_name="USB_CLASSES.hpp" />
       <file file_name="USB_CONSTS.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
       <file file_name="VENDOR_CONSTANT_WRAP.hpp" />
+      <file file_name="VendorFunctionsWrap.hpp" />
+      <file file_name="wrappers_declarations.hpp" />
     </folder>
     <folder Name="Setup" />
     <folder Name="Source">
@@ -101,8 +103,8 @@
     <folder Name="System">
       <file file_name="$(DeviceVectorsFile:)" />
       <file file_name="System/Cortex_M_Startup.s" />
+      <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
-    <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
   </project>
 </solution>

@@ -8,14 +8,21 @@ extern "C"{
 #include <stdint.h> 
 #include "USB_CONSTS.hpp"
 #include "USB_CLASSES.hpp"
-#include "StellarisWareWrap.hpp"
-#include "VENDOR_CONSTANT_WRAP.hpp"
+//#include "VendorFunctionsWrap.hpp"
+//#include "wrappers_declarations.hpp"
+
+//#include "VENDOR_CONSTANT_WRAP.hpp"
+
+#include "wrappers_headers.hpp"
 
 
-//using USBWRP=MyUSB<StellarisWrap::StellarisUSB>;
-using USBWRP=MyUSB<StellarisWrap::StellarisUSB>;
+using  PROC=Stellaris;
 
-//using VndCnst = VendorConsts<StellarisWrap>;
+using USBWRP=MyUSB<FunctionWraper<PROC>::USB,PROC>;
+using USBVndCnst = VendorConsts<PROC>;
+
+
+
 
 
 
@@ -25,17 +32,17 @@ using USBWRP=MyUSB<StellarisWrap::StellarisUSB>;
 
 constexpr uint32_t CDC_USB_BASE=USB0_BASE;
 
-constexpr uint32_t CDC0_DATA_IN_EP = USB_EP_2;
+constexpr MyUSB_EP CDC0_DATA_IN_EP = MyUSB_EP::EP2;
 constexpr uint32_t CDC0_DATA_IN_EP_SZ = 64;
 constexpr uint32_t CDC0_DATA_IN_INT = USB_INTEP_DEV_IN_2;
 constexpr uint8_t  CDC0_DATA_IN_EP_ADDR EP_IN(2);
 
-constexpr uint32_t CDC0_DATA_OUT_EP = USB_EP_2;
+constexpr MyUSB_EP CDC0_DATA_OUT_EP = MyUSB_EP::EP2;
 constexpr uint32_t CDC0_DATA_OUT_EP_SZ = 64;
 constexpr uint32_t CDC0_DATA_OUT_INT = USB_INTEP_DEV_OUT_2;
 constexpr uint8_t  CDC0_DATA_OUT_EP_ADDR EP_OUT(2);
 
-constexpr uint32_t CDC0_COMMUNICATION_EP = USB_EP_1;
+constexpr MyUSB_EP CDC0_COMMUNICATION_EP = MyUSB_EP::EP1;
 constexpr uint32_t CDC0_COMMUNICFTION_EP_SZ = 16;
 constexpr uint32_t CDC0_COMMUNICATION_INT = USB_INTEP_DEV_IN_1;
 constexpr uint8_t  CDC0_COMMUNICATION_EP_ADDR EP_IN(1);

@@ -278,18 +278,13 @@ using CDC_DEVICE_CLASS_t = DEVICE_CLASS_t<CDC_Interfaces>;
 std::get<0>(DEVICE.interfaces).endpoints
 std::get<1>(DEVICE.interfaces).endpoints*/
 
-
-
-
-
-
-/*
-struct CDC_DEVICE_CLASS_t{
-uint16_t vid;
-uint16_t pid;
-USB_Interfaces<2> interfaces;
-USB_Endpoins<3> endpoints;
-};*/
+enum class MyUSB_EP : uint8_t
+{
+    EP0, EP1, EP2, EP3, EP4, EP5, EP6, EP7,
+    EP8, EP9, EP10, EP11, EP12, EP13, EP14, EP15,
+    EP16, EP17, EP18, EP19, EP20, EP21, EP22, EP23,
+    EP24, EP25, EP26, EP27, EP28, EP29, EP30, EP31
+};
 
 
 
@@ -299,17 +294,17 @@ uint16_t rx_fr_size;
 
 uint32_t USB_BASE;
 
-uint32_t DATA_IN_EP;
+MyUSB_EP DATA_IN_EP;
 uint32_t DATA_IN_EP_SZ;
 uint32_t DATA_IN_INT;
 uint8_t DATA_IN_EP_ADDR;
 
-uint32_t DATA_OUT_EP;
+MyUSB_EP DATA_OUT_EP;
 uint32_t DATA_OUT_EP_SZ;
 uint32_t DATA_OUT_INT;
 uint8_t  DATA_OUT_EP_ADDR;
 
-uint32_t COMMUNICATION_EP;
+MyUSB_EP COMMUNICATION_EP;
 uint32_t COMMUNICATION_EP_SZ;
 uint32_t COMMUNICATION_INT;
 uint8_t COMMUNICATION_EP_ADDR;  
@@ -360,6 +355,10 @@ struct {uint32_t dwDTERate;   // скорость, little-endian
 		uint8_t arr[8];
   };
 inline _Buffer buffer={.arr={0,0,0,0,0,0,0,0}};
+
+
+
+
 
 
 
