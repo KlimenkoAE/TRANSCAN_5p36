@@ -4,9 +4,9 @@
 #include "USB_THIS_PROGRAM_DEFS.hpp"
 #include "_TIMERS.hpp"
 #include "_USB.hpp"
+#include "wrappers_headers.hpp"
 
-
-extern "C"{
+/*extern "C"{
 #include "hw_ints.h"
 #include "timer.h"
 #include "sysctl.h"
@@ -14,7 +14,7 @@ extern "C"{
 #include "hw_uart.h"
 #include "interrupt.h"
 #include "lm3s5p36.h"
- }
+ }*/
 
 /*extern "C" void CPUcpsie(void)
 {
@@ -120,12 +120,11 @@ T_us.Disable();
 
 
 
-  USB<USB0_BASE,
-  INT_USB0,//INT_USB0
-  SYSCTL_PERIPH_USB0,//SYSCTL_PERIFERAL_USB0
+  USB<
+  CONTROL_EP,
   CDC_DEVICE_CLASS //
   >USB0;
-
+uint8_t df1,df2;
   //cdc 0
   CDC
   <

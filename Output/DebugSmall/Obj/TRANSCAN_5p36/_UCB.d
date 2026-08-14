@@ -1,4 +1,4 @@
-Output/Release_MinSize/Obj/TRANSCAN_5p36/_UCB.bc: \
+Output/DebugSmall/Obj/TRANSCAN_5p36/_UCB.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_UCB.cpp \
   ../StellarisWare/inc/hw_types.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
@@ -650,9 +650,8 @@ Output/Release_MinSize/Obj/TRANSCAN_5p36/_UCB.bc: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/wrappers_headers.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/lm3s5p36.h \
   ../StellarisWare/driverlib/timer.h ../StellarisWare/inc/hw_uart.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \

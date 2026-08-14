@@ -27,10 +27,11 @@ extern "C"{
 #define USB_GEN_INT_EN USB_INTCTRL_RESET|USB_INTCTRL_SUSPEND|USB_INTCTRL_RESUME|USB_INTCTRL_SOF
 
 template<
-uint32_t usb_base,
+auto ,
 auto 
 >
 class USBEnumerator;
+
 class USB_DescriptorTypes;
 
 
@@ -44,9 +45,7 @@ void Registration(std::function<void()> isr, uint32_t sw_def, ...);
 
 //////////////////////////CLASS USB
 template<
-uint32_t usb_base,
-uint32_t usb_int,//INT_USB0
-uint32_t sysctl_periferal,//SYSCTL_PERIFERAL_USB0
+PHYControlEndpoint<PROC> CTR_EP,
 auto usb_dev  //DEVICE_CLASS
 >
 class USB{
@@ -58,20 +57,21 @@ public:
 USB(){
   UISR.Registration([this](){
       this->ISR();
-      },usb_base);
+      },CTR_EP.USB_BASE);
 
   ExtSetupHandlerRegister([this](const _Buffer& su_buf,uint32_t& sup_data){
 
-                   USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0,false);
-                         while(!(HWREGB(usb_base+ USB_CSRL0 )&USB_CSRL0_SETEND));
-                   USBWRP::DevAddrSet(usb_base,(unsigned long)(buffer.wValueL&0x7F));
+                   USBWRP::DevEndpointDataAck( CTR_EP,false);
+                         while(!(HWREGB(CTR_EP.USB_BASE+ USB_CSRL0 )&USB_CSRL0_SETEND));
+                   USBWRP::DevAddrSet(CTR_EP.USB_BASE,(unsigned long)(buffer.wValueL&0x7F));
 
                     device_state=Adressed;
                   },
                   SET_ADDRESS);
 
+
 ////////USB INIT
- MAP_SysCtlPeripheralEnable(sysctl_periferal);
+/* MAP_SysCtlPeripheralEnable(sysctl_periferal);
 
   //The next step is to enable the USB PLL 
   //so that the correct clocking is provided to the PHY.
@@ -80,7 +80,7 @@ USB(){
 
  // USBIntRegister(usb_base, ISR_USB);
   
-MAP_IntEnable(usb_int);
+MAP_IntEnable(INT_USB0);
 
 USBWRP::IntDisableControl(usb_base,USB_INTCTRL_ALL);
 USBWRP::IntEnableControl(usb_base,USB_GEN_INT_EN);
@@ -90,9 +90,11 @@ USBWRP::IntEnableEndpoint(usb_base,USB_INT_EP0);
 
 USBWRP::IntEnable(usb_base,USB_INT_ALL );
 
-USBWRP::DevConnect(usb_base);
-
+USBWRP::DevConnect(usb_base);*/
+USBWRP::UsbInit(CTR_EP );
 }
+
+
 
 void ISR(){
 
@@ -106,10 +108,10 @@ type0  = HWREGB(USB0_BASE + USB_O_TYPE0);   // если есть
 
 uint32_t int_GEN_status;
 uint32_t int_COM_status;
-  int_COM_status=USBWRP::IntStatusEndpoint(usb_base);
+  int_COM_status=USBWRP::IntStatusEndpoint(CTR_EP.USB_BASE);
   if(int_COM_status!=0)
     USB_COM_Vector(int_COM_status);
-  int_GEN_status=USBWRP::IntStatusControl(usb_base);
+  int_GEN_status=USBWRP::IntStatusControl(CTR_EP.USB_BASE);
     USB_GEN_Vector(int_GEN_status);
 return;
 }
@@ -140,7 +142,7 @@ return 0;
 inline int USB_COM_Vector(uint32_t int_COM_status){
 
  if(int_COM_status&USB_INTEP_0){
-unsigned long SetupPacketSz = USBWRP::EndpointDataAvail(usb_base, MyUSB_EP::EP0);
+unsigned long SetupPacketSz = USBWRP::EndpointDataAvail(CTR_EP.USB_BASE, CTR_EP);
 
   if(SetupPacketSz>0)
   {
@@ -148,36 +150,36 @@ unsigned long SetupPacketSz = USBWRP::EndpointDataAvail(usb_base, MyUSB_EP::EP0)
   //  int_COM_status&=~(USB_INTEP_0);
   }
 }
-USB_COM_Handlers<usb_base>::Execute(int_COM_status);
+USB_COM_Handlers<CTR_EP.USB_BASE>::Execute(int_COM_status);
 
 return 0;
 }
 
 ////////////////////
 
-USBEnumerator<usb_base,usb_dev>Enumerator;
+USBEnumerator<CTR_EP,usb_dev>Enumerator;
 USB_Descriptors<usb_dev> Descriptors;
 
 };//class USB
 
 
 template<
-uint32_t usb_base,
-auto usb_dev
+auto CTR_EP,
+auto USB_DEV
 >
 class USBEnumerator{
  inline static SetupStage_t SetupStage;
- 
-static void EP_StatusClear(MyUSB_EP ep){
+ /*
+static void EP_StatusClear(USBVndCnst::MyUSB_EP ep){
  uint32_t st  = USBWRP::EndpointStatus(usb_base, ep);
     USBWRP::DevEndpointStatusClear(usb_base, ep, st);
 }
-
+*/
 
 public:
 inline int USB_COM_Vector(uint32_t int_COM_status,unsigned long   SetupPacketSz,_device_state& device_state){
 
-    USBWRP::EndpointDataGet (usb_base,  MyUSB_EP::EP0, (uint8_t*)&buffer,  &SetupPacketSz);
+    USBWRP::EndpointDataGet ( CTR_EP, (uint8_t*)&buffer,  &SetupPacketSz);
       if(SetupStage.Stage==SETUP)
           SetupStage.Request=buffer.wRequest;
     processingSetupPackage(SetupStage.Request,device_state);
@@ -206,12 +208,12 @@ static void processingSetupPackage(uint16_t rq,_device_state& device_state){
                 {
                     case 1: // DEVICE_REMOTE_WAKEUP
                         // remote_wakeup_enabled = 0;
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                        USBWRP::DevEndpointDataAck(CTR_EP, true);
                         break;
 
                     default:
                         // CLEAR TEST_MODE по спеке нельзя
-                        USBWRP::DevEndpointStall(usb_base,  MyUSB_EP::EP0, USB_EP_DEV_OUT);
+                        USBWRP::DevEndpointStall(CTR_EP, USB_EP_DEV_OUT);
                         break;
                 }
                 break;
@@ -225,55 +227,55 @@ static void processingSetupPackage(uint16_t rq,_device_state& device_state){
                 // уточняем feature = ENDPOINT_HALT (wValue == 0)
                 if (buffer.wValue != 0)
                 {
-                    USBWRP::DevEndpointStall(usb_base,  MyUSB_EP::EP0, USB_EP_DEV_OUT);
+                    USBWRP::DevEndpointStall(CTR_EP, USB_EP_DEV_OUT);
                     break;
                 }
 
                 switch (buffer.wIndexL)
                 {
                     case 0x81: // EP1 IN — Interrupt (SERIAL_STATE)
-                        USBWRP::DevEndpointStallClear(usb_base,  MyUSB_EP::EP1, USB_EP_DEV_IN);
-                        USBWRP::EndpointDataToggleClear(usb_base, MyUSB_EP::EP1, USB_EP_DEV_IN);
-                        EP_StatusClear( MyUSB_EP::EP1);
+                        USBWRP::DevEndpointStallClear(usb_base,  USBVndCnst::MyUSB_EP::EP1, USB_EP_DEV_IN);
+                        USBWRP::EndpointDataToggleClear(usb_base, USBVndCnst::MyUSB_EP::EP1, USB_EP_DEV_IN);
                         Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x81);
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                     
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP0, true);
                         break;
 
                     case 0x02: // EP2 OUT — Bulk OUT
-                        USBWRP::DevEndpointStallClear(usb_base,  MyUSB_EP::EP2, USB_EP_DEV_OUT);
-                        USBWRP::EndpointDataToggleClear(usb_base, MyUSB_EP::EP2, USB_EP_DEV_OUT);
-                         EP_StatusClear( MyUSB_EP::EP2);
+                        USBWRP::DevEndpointStallClear(usb_base,  USBVndCnst::MyUSB_EP::EP2, USB_EP_DEV_OUT);
+                        USBWRP::EndpointDataToggleClear(usb_base, USBVndCnst::MyUSB_EP::EP2, USB_EP_DEV_OUT);
+                        // EP_StatusClear( USBVndCnst::MyUSB_EP::EP2);
                           Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x02);
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP0, true);
                         // снова разрешить приём на OUT
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP2, false);
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP2, false);
 
                         break;
 
                     case 0x82: // EP2 IN — Bulk IN (типичный CDC)
-                        EP_StatusClear(MyUSB_EP::EP2);
-                        USBWRP::EndpointDataToggleClear(usb_base, MyUSB_EP::EP2, USB_EP_DEV_IN);             
+                     //   EP_StatusClear(USBVndCnst::MyUSB_EP::EP2);
+                        USBWRP::EndpointDataToggleClear(usb_base, USBVndCnst::MyUSB_EP::EP2, USB_EP_DEV_IN);             
                         Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x82);
-                        USBWRP::DevEndpointStallClear(usb_base,  MyUSB_EP::EP2, USB_EP_DEV_IN);
+                        USBWRP::DevEndpointStallClear(usb_base,  USBVndCnst::MyUSB_EP::EP2, USB_EP_DEV_IN);
                         SysCtlDelay(DELAY_LOAD_1us*100);
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP0, true);
                         break;
 
                     case 0x83: // EP3 IN — только если такой endpoint есть
-                        USBWRP::DevEndpointStallClear(usb_base,  MyUSB_EP::EP3, USB_EP_DEV_IN);
-                        USBWRP::EndpointDataToggleClear(usb_base, MyUSB_EP::EP3, USB_EP_DEV_IN);
+                        USBWRP::DevEndpointStallClear(usb_base,  USBVndCnst::MyUSB_EP::EP3, USB_EP_DEV_IN);
+                        USBWRP::EndpointDataToggleClear(usb_base, USBVndCnst::MyUSB_EP::EP3, USB_EP_DEV_IN);
                          Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x83);
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP0, true);
                         break;
 
                     case 0x01: // EP1 OUT — на всякий случай (в логе бывало wIndex=0001)
                         // если EP1 OUT нет в дескрипторах — можно просто ACK
                          Execute_ExtSetupHandler(CLEAR_FEATURE_ENDPNT, 0x01);
-                        USBWRP::DevEndpointDataAck(usb_base,  MyUSB_EP::EP0, true);
+                        USBWRP::DevEndpointDataAck(usb_base,  USBVndCnst::MyUSB_EP::EP0, true);
                         break;
 
                     default:
-                        USBWRP::DevEndpointStall(usb_base, MyUSB_EP::EP0, USB_EP_DEV_OUT);
+                        USBWRP::DevEndpointStall(usb_base, USBVndCnst::MyUSB_EP::EP0, USB_EP_DEV_OUT);
                         break;
                 }
                 break;
@@ -284,15 +286,15 @@ static void processingSetupPackage(uint16_t rq,_device_state& device_state){
                   {
                       case 1: // DEVICE_REMOTE_WAKEUP
                           // remote_wakeup_enabled = 1;
-                          USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0, true);
+                          USBWRP::DevEndpointDataAck(usb_base, USBVndCnst::MyUSB_EP::EP0, true);
                           break;
 
                       case 2: // TEST_MODE (для FS CDC обычно не нужен)
-                          USBWRP::DevEndpointStall(usb_base, MyUSB_EP::EP0, USB_EP_DEV_OUT);
+                          USBWRP::DevEndpointStall(usb_base, USBVndCnst::MyUSB_EP::EP0, USB_EP_DEV_OUT);
                           break;
 
                       default:
-                          USBWRP::DevEndpointStall(usb_base, MyUSB_EP::EP0, USB_EP_DEV_OUT);
+                          USBWRP::DevEndpointStall(usb_base, USBVndCnst::MyUSB_EP::EP0, USB_EP_DEV_OUT);
                           break;
                   }
                   break;
@@ -364,13 +366,13 @@ static void processingSetupPackage(uint16_t rq,_device_state& device_state){
 if(SetupStage.Stage==enumSetupStage::SETUP){
 SetupStage.Stage=enumSetupStage::DATA;
 SetupStage.data_len=(uint16_t)buffer.wLengt;
-USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0, false);
+USBWRP::DevEndpointDataAck(usb_base, USBVndCnst::MyUSB_EP::EP0, false);
 //ToDebugPrint.DebugPrintAdd(0,EP_CONTROL_STATUS_F,SET_CONFIGURATION,"SETUP STAGE CDC_SET_LINE_CODING");
 }
 else
 {
     Execute_ExtSetupHandler(USB_CDC_SET_LINE_CODING,0,buffer,(uint32_t&)SetupStage.data_len);  
-                USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0, true);
+                USBWRP::DevEndpointDataAck(usb_base, USBVndCnst::MyUSB_EP::EP0, true);
 SetupStage.Stage=enumSetupStage::SETUP;
 }                  
                 break;
@@ -382,7 +384,7 @@ SetupStage.Stage=enumSetupStage::SETUP;
 
 
                 // Завершаем control-transfer
-                USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0, true);
+                USBWRP::DevEndpointDataAck(usb_base, USBVndCnst::MyUSB_EP::EP0, true);
 
                 break;
 
@@ -391,12 +393,12 @@ SetupStage.Stage=enumSetupStage::SETUP;
                 case USB_CDC_SET_CONTROL_LINE_STATE:
                Execute_ExtSetupHandler(USB_CDC_SET_CONTROL_LINE_STATE,0,buffer) ;
 
-                USBWRP::DevEndpointDataAck(usb_base, MyUSB_EP::EP0, true);
+                USBWRP::DevEndpointDataAck(usb_base, USBVndCnst::MyUSB_EP::EP0, true);
                  break;	
 		
 no_implementation:		
 		default:
-                USBWRP::DevEndpointStall(usb_base,MyUSB_EP::EP0,USB_EP_DEV_IN);
+                USBWRP::DevEndpointStall(usb_base,USBVndCnst::MyUSB_EP::EP0,USB_EP_DEV_IN);
 		//stall();
 		break;
 	}
@@ -406,7 +408,7 @@ no_implementation:
 static void status_dev(){
 //bus powred, remote wakeup
 SetUpAnswer((uint8_t*)&STATUS_DEVICE,sizeof(STATUS_DEVICE),buffer.wLengthL);
-        USBWRP::EndpointDataPut(usb_base, MyUSB_EP::EP0, (uint8_t*)&STATUS_DEVICE, buffer.wLengthL);
+        USBWRP::EndpointDataPut(usb_base, USBVndCnst::MyUSB_EP::EP0, (uint8_t*)&STATUS_DEVICE, buffer.wLengthL);
 }
 static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 
@@ -416,16 +418,16 @@ static void SetUpAnswer(uint8_t* buf,uint8_t buf_sz,uint8_t host_await_sz){
 
         while(byte_left>=EP0_SZ){
           uint8_t byte_to_transfer=EP0_SZ;      
-          while( USBWRP::EndpointDataPut(usb_base,MyUSB_EP::EP0,data_begin,byte_to_transfer)==-1){;}; 
+          while( USBWRP::EndpointDataPut(usb_base,USBVndCnst::MyUSB_EP::EP0,data_begin,byte_to_transfer)==-1){;}; 
         if(byte_left==0)      
-          {while(USBWRP::EndpointDataSend(usb_base,MyUSB_EP::EP0,USB_TRANS_IN)==-1){;};break;}
-        else {while(USBWRP::EndpointDataSend(usb_base,MyUSB_EP::EP0,USB_TRANS_IN)==-1){;}};
+          {while(USBWRP::EndpointDataSend(usb_base,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN)==-1){;};break;}
+        else {while(USBWRP::EndpointDataSend(usb_base,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN)==-1){;}};
         byte_left-=byte_to_transfer;
         data_begin+=byte_to_transfer;
 	}
         //0<byte_left<EP0_SZ
-        while( USBWRP::EndpointDataPut(usb_base,MyUSB_EP::EP0,data_begin,byte_left)==-1){;};
-        while( USBWRP::EndpointDataSend(usb_base,MyUSB_EP::EP0,USB_TRANS_IN_LAST)==-1){;};
+        while( USBWRP::EndpointDataPut(usb_base,USBVndCnst::MyUSB_EP::EP0,data_begin,byte_left)==-1){;};
+        while( USBWRP::EndpointDataSend(usb_base,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN_LAST)==-1){;};
 }
 
 };//Class USB_Enumerator
@@ -816,18 +818,18 @@ memcpy(dbg_buf,buf,buf_sz);
 
         while(byte_left>=EP0_SZ){
           uint8_t byte_to_transfer=EP0_SZ;      
-          while( USBWRP::EndpointDataPut(USB0_BASE,MyUSB_EP::EP0,data_begin,byte_to_transfer)==-1){;}; 
+          while( USBWRP::EndpointDataPut(USB0_BASE,USBVndCnst::MyUSB_EP::EP0,data_begin,byte_to_transfer)==-1){;}; 
         if(byte_left==0)      
-          {while(USBWRP::EndpointDataSend(USB0_BASE,MyUSB_EP::EP0,USB_TRANS_IN)==-1){;};break;}
-        else {while(USBWRP::EndpointDataSend(USB0_BASE,MyUSB_EP::EP0,USB_TRANS_IN)==-1){;}};
+          {while(USBWRP::EndpointDataSend(USB0_BASE,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN)==-1){;};break;}
+        else {while(USBWRP::EndpointDataSend(USB0_BASE,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN)==-1){;}};
         byte_left-=byte_to_transfer;
         data_begin+=byte_to_transfer;
 	}
         //0<byte_left<EP0_SZ
   //      memcpy(dbg_buf,buf,buf_sz);
-        while( USBWRP::EndpointDataPut(USB0_BASE,MyUSB_EP::EP0,data_begin,byte_left)==-1){;};
+        while( USBWRP::EndpointDataPut(USB0_BASE,USBVndCnst::MyUSB_EP::EP0,data_begin,byte_left)==-1){;};
         //uint32_t cnt = HWREGB(USB0_BASE + USB_O_COUNT0);
-        while( USBWRP::EndpointDataSend(USB0_BASE,MyUSB_EP::EP0,USB_TRANS_IN_LAST)==-1){;};
+        while( USBWRP::EndpointDataSend(USB0_BASE,USBVndCnst::MyUSB_EP::EP0,USB_TRANS_IN_LAST)==-1){;};
 }
 public:
 static bool DescriptorSend(uint8_t desc_type,uint16_t host_await_sz,uint8_t index=0){

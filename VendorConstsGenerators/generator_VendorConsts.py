@@ -13,15 +13,17 @@ vendor = sys.argv[1].lower()
 library_path = Path(sys.argv[2]).resolve()
 
 
+
 generators = {
     "stellaris": [
         "gen_usb_defs.py",
         "gen_usb_regs.py",
+        "gen_hw_ints.py",
     ],
 
     "stm32": [
         # "gen_usb_defs.py",
-        # "gen_stm32_regs.py",
+         "gen_stm32.py",
     ],
 
     "atmega": [
@@ -39,7 +41,16 @@ if vendor not in generators:
 generator_root = Path(__file__).resolve().parent
 project_root = generator_root.parent
 
-generator_dir = generator_root / vendor.capitalize()
+vendor_dirs = {
+    "stellaris": "Stellaris",
+    "stm32": "STM32",
+    "atmega": "ATMega",
+}
+
+generator_dir = generator_root / vendor_dirs[vendor]
+
+
+#generator_dir = generator_root / vendor.capitalize()
 
 output = project_root / f"{vendor.capitalize()}Definition.hpp"
 
@@ -53,7 +64,7 @@ with open(output, "w", encoding="utf-8") as f:
     f.write("#pragma once\n")
     f.write("#include <cstdint>\n\n")
     f.write("#include \"usb.h\"\n\n")
-
+    f.write("#include \"hw_ints.h\"\n\n")
 
 # ------------------------------------------------------------
 # Run generators

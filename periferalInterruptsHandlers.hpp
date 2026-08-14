@@ -14,29 +14,30 @@ enum class MyUSB_EP_INT : uint8_t
 };
 
 
-constexpr unsigned EPIndex(uint32_t m)//плучаем номер младшего установленного бита
+/*constexpr unsigned EPIndex(uint32_t m)//плучаем номер младшего установленного бита
 {                                     //на этапе компиляции вычислит и присвоит лямбды в какомто порядке- не важно
     unsigned b = std::__countr_zero(m);
 
     return (b < 16) ? (b - 1)       // IN
                     : (31 - b + 15);// OUT
-};
+};*/
 
 template<uint32_t usb_base>//usb_base
 class USB_COM_Handlers{
 public:
+
 inline static  std::function<void()> handlers[30];
 
 static  void Execute(uint32_t int_COM_status){
 
   while (int_COM_status) {
-   auto& h = handlers[EPIndex(int_COM_status)]; 
+   auto& h = handlers[USBWRP::COMInterruptIndex(int_COM_status)]; 
     if (h) h();
-    int_COM_status &= int_COM_status - 1;
+    int_COM_status &= int_COM_status - 1;//убирает последни установленны бит
   }
 }
- static  void Register(uint32_t int_ep,std::function<void()> handler){
-  handlers[EPIndex(int_ep)]=handler;
+ static  void Register(uint32_t int_COM_status,std::function<void()> handler){
+  handlers[USBWRP::COMInterruptIndex(int_COM_status)]=handler;
   }
 };
 

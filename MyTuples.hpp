@@ -189,24 +189,3 @@ static_assert(CTuple<int, char, double>::size == 3);
 
 
 
-////////////////////////////////////////////////////////////
-// get<I>()
-////////////////////////////////////////////////////////////
-
-/*template<std::size_t I, class T, class... Rest>
-constexpr auto& get(CTuple<T, Rest...>& t)
-{
-    if constexpr (I == 0)
-        return t.value;
-    else
-        return get<I - 1>(t.rest);
-}
-
-template<std::size_t I, class T, class... Rest>
-constexpr const auto& get(const CTuple<T, Rest...>& t)
-{
-    if constexpr (I == 0)
-        return t.value;
-    else
-        return get<I - 1>(t.rest);
-}*/

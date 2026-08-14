@@ -1,16 +1,7 @@
 #pragma once
 #include <cstdarg>
 #include <cstdint>
-extern "C"{
-#include "hw_types.h"
-#include "usb.h"
-#include "hw_usb.h"
-#include "lm3s5p36.h"
-#include "rom_map.h"
-#include "hw_memmap.h"
 
-}
-//#include  "VENDOR_CONSTANT_WRAP.hpp"
 #include "wrappers_headers.hpp"
 
 template <>
@@ -18,520 +9,207 @@ class FunctionWraper<Stellaris>{
 public:
   class USB{
 public:
-  static uint32_t IntStatusControl(unsigned long ulBase)
-  {
-     return  MAP_USBIntStatusControl(ulBase);
-  }
 
-  static uint32_t IntStatusEndpoint(unsigned long ulBase)
-  {
-      return MAP_USBIntStatusEndpoint(ulBase);
-  }
-  ////////
-
-static void IntEnableEndpoint(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntEnableEndpoint(ulBase, ulFlags);
-  }
-
-static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntEnableControl(ulBase, ulFlags);
-  }
-
-  static void IntDisable(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntDisable(ulBase, ulFlags);
-  }
-
-  static void IntDisableControl(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntDisableControl(ulBase, ulFlags);
-  }
-
-  static void IntDisableEndpoint(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntDisableEndpoint(ulBase, ulFlags);
-  }
-
-  static void IntEnable(unsigned long ulBase, unsigned long ulFlags)
-  {
-      MAP_USBIntEnable(ulBase, ulFlags);
-  }
-
-  static void EndpointDataToggleClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBEndpointDataToggleClear(ulBase, ulEndpoint, ulFlags);
-  }
-
-  static void EndpointDMAChannel(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulChannel)
-  {
-      MAP_USBEndpointDMAChannel(ulBase, ulEndpoint, ulChannel);
-  }
-
-  static void EndpointDMADisable(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBEndpointDMADisable(ulBase, ulEndpoint, ulFlags);
-  }
-
-  static void EndpointDMAEnable(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBEndpointDMAEnable(ulBase, ulEndpoint, ulFlags);
-  }
-
-  static unsigned long EndpointStatus(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
-  {
-      return MAP_USBEndpointStatus(ulBase, ulEndpoint);
-  }
-
-  static unsigned long FIFOAddrGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
-  {
-      return MAP_USBFIFOAddrGet(ulBase, ulEndpoint);
-  }
-
-  static void FIFOConfigGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long* pulFIFOAddress,
-      unsigned long* pulFIFOSize,
-      unsigned long ulFlags)
-  {
-      MAP_USBFIFOConfigGet(
-          ulBase,
-          ulEndpoint,
-          pulFIFOAddress,
-          pulFIFOSize,
-          ulFlags);
-  }
-
-  static void FIFOConfigSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFIFOAddress,
-      unsigned long ulFIFOSize,
-      unsigned long ulFlags)
-  {
-      MAP_USBFIFOConfigSet(
-          ulBase,
-          ulEndpoint,
-          ulFIFOAddress,
-          ulFIFOSize,
-          ulFlags);
-  }
-
-  static void FIFOFlush(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBFIFOFlush(ulBase, ulEndpoint, ulFlags);
-  }
-
-  static unsigned long FrameNumberGet(unsigned long ulBase)
-  {
-      return MAP_USBFrameNumberGet(ulBase);
-  }
-
-  static unsigned long HostAddrGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      return MAP_USBHostAddrGet(ulBase, ulEndpoint, ulFlags);
-  }
-
-  static void HostAddrSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulAddr,
-      unsigned long ulFlags)
-  {
-      MAP_USBHostAddrSet(ulBase, ulEndpoint, ulAddr, ulFlags);
-  }
-
-  static void HostEndpointConfig(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulMaxPayload,
-      unsigned long ulNAKPollInterval,
-      unsigned long ulTargetEndpoint,
-      unsigned long ulFlags)
-  {
-      USBHostEndpointConfig(
-          ulBase,
-          ulEndpoint,
-          ulMaxPayload,
-          ulNAKPollInterval,
-          ulTargetEndpoint,
-          ulFlags);
-  }
-
-  static void HostEndpointDataAck(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
-  {
-      MAP_USBHostEndpointDataAck(ulBase, ulEndpoint);
-  }
-
-  static void HostEndpointDataToggle(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      bool bDataToggle,
-      unsigned long ulFlags)
-  {
-      MAP_USBHostEndpointDataToggle(
-          ulBase,
-          ulEndpoint,
-          bDataToggle,
-          ulFlags);
-  }
-
-  static void HostEndpointStatusClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBHostEndpointStatusClear(
-          ulBase,
-          ulEndpoint,
-          ulFlags);
-  }
-
-  static unsigned long DevAddrGet(unsigned long ulBase)
-  {
-      return MAP_USBDevAddrGet(ulBase);
-  }
-
-  static void DevAddrSet(
-      unsigned long ulBase,
-      unsigned long ulAddress)
-  {
-      MAP_USBDevAddrSet(ulBase, ulAddress);
-  }
-
-  static void DevConnect(unsigned long ulBase)
-  {
-      MAP_USBDevConnect(ulBase);
-  }
-
-  static void DevDisconnect(unsigned long ulBase)
-  {
-      MAP_USBDevDisconnect(ulBase);
-  }
-
-  static void DevEndpointConfigGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long* pulMaxPacketSize,
-      unsigned long* pulFlags)
-  {
-      MAP_USBDevEndpointConfigGet(
-          ulBase,
-          ulEndpoint,
-          pulMaxPacketSize,
-          pulFlags);
-  }
-
-  static void DevEndpointConfigSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulMaxPacketSize,
-      unsigned long ulFlags)
-  {
-      MAP_USBDevEndpointConfigSet(
-          ulBase,
-          ulEndpoint,
-          ulMaxPacketSize,
-          ulFlags);
-  }
-
-  static void DevEndpointDataAck(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      bool bIsLastPacket)
-  {
-      MAP_USBDevEndpointDataAck(
-          ulBase,
-          ulEndpoint,
-          bIsLastPacket);
-  }
-
-  static void DevEndpointStall(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBDevEndpointStall(
-          ulBase,
-          ulEndpoint,
-          ulFlags);
-  }
-
-  static void DevEndpointStallClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBDevEndpointStallClear(
-          ulBase,
-          ulEndpoint,
-          ulFlags);
-  }
-
-  static void DevEndpointStatusClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFlags)
-  {
-      MAP_USBDevEndpointStatusClear(
-          ulBase,
-          ulEndpoint,
-          ulFlags);
-  }
-
-  static void DevMode(unsigned long ulBase)
-  {
-      MAP_USBDevMode(ulBase);
-  }
-
-  static unsigned long EndpointDataAvail(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
-  {
-      return MAP_USBEndpointDataAvail(
-          ulBase,
-          ulEndpoint);
-  }
-
-  static long EndpointDataGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned char* pucData,
-      unsigned long* pulSize)
-    {
-        return MAP_USBEndpointDataGet(
-            ulBase,
-            ulEndpoint,
-            pucData,
-            pulSize);
-    }
-
-    static long EndpointDataPut(
-        unsigned long ulBase,
-        unsigned long ulEndpoint,
-        unsigned char* pucData,
-        unsigned long ulSize)
-    {
-        return MAP_USBEndpointDataPut(
-            ulBase,
-            ulEndpoint,
-            pucData,
-            ulSize);
-    }
-
-    static long EndpointDataSend(
-        unsigned long ulBase,
-        unsigned long ulEndpoint,
-        unsigned long ulTransType)
-    {
-        return MAP_USBEndpointDataSend(
-            ulBase,
-            ulEndpoint,
-            ulTransType);
-    }
-static void SelectEndpoit(uint32_t epn){
-
-        USB0_EPIDX_R=epn;
-      }
+static constexpr uint16_t EndpointConfig(PHYEndpoint<Stellaris>& ep, uint16_t fifo_shift){
 
 
-  };
+SelectEndpoit(ep);
+
+DevEndpointConfigSet(ep);
+          //ep.USB_BASE,
+          //ep.ALIAS, 
+          //ep.SZ,
+          //ep.FIFO.CFG_FLAGS);
+          //USB_EP_MODE_INT|USB_EP_DEV_IN
+          //|USB_EP_AUTO_SET|USB_EP_DMA_MODE_0
+     
+
+SetEndpoitFIFO_Size(ep);
+
+  FIFOConfigSet(ep,fifo_shift);
+
+return  fifo_shift+=ep.SZ*(ep.FIFO.DoubleBuffered?2:1);
 
 };
 
-//class StellarisWrap{
+static constexpr void UsbInit(const PHYControlEndpoint<Stellaris>& ctr_ep ){
+
+////////USB INIT
+ MAP_SysCtlPeripheralEnable(ctr_ep.INIT_DATA.SysCtlPeriferal );
 
 
 
-//public:
-/*  struct StellarisWrap::StellarisUSB
+  MAP_SysCtlUSBPLLEnable();
+  
+  MAP_USBIntDisable(ctr_ep.USB_BASE, ctr_ep.INIT_DATA.INT_USBDevice);
+
+  MAP_USBIntDisableControl(ctr_ep.USB_BASE,ctr_ep.INIT_DATA.INT_GEN_FlagsAll);
+  MAP_USBIntEnableControl(ctr_ep.USB_BASE,ctr_ep.INIT_DATA.INT_GEN_Flags_Enable);
+
+  MAP_USBIntDisableEndpoint(ctr_ep.USB_BASE,ctr_ep.INIT_DATA.INT_All);
+  MAP_USBIntEnableEndpoint(ctr_ep.USB_BASE,ctr_ep.INIT_DATA.INT_EP0);
+
+  MAP_USBIntEnable(ctr_ep.USB_BASE, ctr_ep.INIT_DATA.INT_USBDevice );
+
+  MAP_USBDevConnect(ctr_ep.USB_BASE);
+}
+
+
+  static uint32_t IntStatusControl(PHYEndpointBase<Stellaris>& endpoint)
   {
-
-
-  static uint32_t IntStatusControl(unsigned long ulBase)
-  {
-     return  MAP_USBIntStatusControl(ulBase);
+     return  MAP_USBIntStatusControl(endpoint.USB_BASE);
   }
 
-  static uint32_t IntStatusEndpoint(unsigned long ulBase)
+  static uint32_t IntStatusEndpoint(PHYEndpointBase<Stellaris>& endpoint)
   {
-      return MAP_USBIntStatusEndpoint(ulBase);
+      return MAP_USBIntStatusEndpoint(endpoint.USB_BASE);
   }
   ////////
 
-static void IntEnableEndpoint(unsigned long ulBase, unsigned long ulFlags)
+static void IntEnableEndpoint(PHYEndpointBase<Stellaris>& endpoint ,unsigned long ulFlags)
   {
-      MAP_USBIntEnableEndpoint(ulBase, ulFlags);
+      MAP_USBIntEnableEndpoint(endpoint.USB_BASE, ulFlags);
   }
 
-static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
+static void IntEnableControl(PHYEndpointBase<Stellaris>& endpoint, unsigned long ulFlags)
   {
-      MAP_USBIntEnableControl(ulBase, ulFlags);
+      MAP_USBIntEnableControl(endpoint.USB_BASE, ulFlags);
   }
 
-  static void IntDisable(unsigned long ulBase, unsigned long ulFlags)
+  static void IntDisable(PHYEndpointBase<Stellaris>& endpoint, unsigned long ulFlags)
   {
-      MAP_USBIntDisable(ulBase, ulFlags);
+      MAP_USBIntDisable(endpoint.USB_BASE, ulFlags);
   }
 
-  static void IntDisableControl(unsigned long ulBase, unsigned long ulFlags)
+  static void IntDisableControl(PHYEndpointBase<Stellaris>& endpoint, unsigned long ulFlags)
   {
-      MAP_USBIntDisableControl(ulBase, ulFlags);
+      MAP_USBIntDisableControl(endpoint.USB_BASE, ulFlags);
   }
 
-  static void IntDisableEndpoint(unsigned long ulBase, unsigned long ulFlags)
+  static void IntDisableEndpoint(PHYEndpointBase<Stellaris>& endpoint, unsigned long ulFlags)
   {
-      MAP_USBIntDisableEndpoint(ulBase, ulFlags);
+      MAP_USBIntDisableEndpoint(endpoint.USB_BASE, ulFlags);
   }
 
-  static void IntEnable(unsigned long ulBase, unsigned long ulFlags)
+  static void IntEnable(PHYEndpointBase<Stellaris>& endpoint,   unsigned long ulFlags)
   {
-      MAP_USBIntEnable(ulBase, ulFlags);
+      MAP_USBIntEnable(endpoint.USB_BASE, ulFlags);
   }
 
   static void EndpointDataToggleClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
-      MAP_USBEndpointDataToggleClear(ulBase, ulEndpoint, ulFlags);
+      MAP_USBEndpointDataToggleClear(endpoint.USB_BASE, endpoint.ALIAS, ulFlags);
   }
 
   static void EndpointDMAChannel(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulChannel)
   {
-      MAP_USBEndpointDMAChannel(ulBase, ulEndpoint, ulChannel);
+      MAP_USBEndpointDMAChannel(endpoint.USB_BASE, endpoint.ALIAS, ulChannel);
   }
 
   static void EndpointDMADisable(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
-      MAP_USBEndpointDMADisable(ulBase, ulEndpoint, ulFlags);
+      MAP_USBEndpointDMADisable(endpoint.USB_BASE, endpoint.ALIAS, ulFlags);
   }
 
   static void EndpointDMAEnable(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
-      MAP_USBEndpointDMAEnable(ulBase, ulEndpoint, ulFlags);
+      MAP_USBEndpointDMAEnable(endpoint.USB_BASE, endpoint.ALIAS, ulFlags);
   }
 
   static unsigned long EndpointStatus(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
+      
+      PHYEndpointBase<Stellaris>& endpoint)
   {
-      return MAP_USBEndpointStatus(ulBase, ulEndpoint);
+      return MAP_USBEndpointStatus(endpoint.USB_BASE, endpoint.ALIAS);
   }
 
   static unsigned long FIFOAddrGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
+      
+      PHYEndpointBase<Stellaris>& endpoint)
   {
-      return MAP_USBFIFOAddrGet(ulBase, ulEndpoint);
+      return MAP_USBFIFOAddrGet(endpoint.USB_BASE, endpoint.ALIAS);
   }
 
   static void FIFOConfigGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long* pulFIFOAddress,
       unsigned long* pulFIFOSize,
       unsigned long ulFlags)
   {
       MAP_USBFIFOConfigGet(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           pulFIFOAddress,
           pulFIFOSize,
           ulFlags);
   }
 
   static void FIFOConfigSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulFIFOAddress,
-      unsigned long ulFIFOSize,
-      unsigned long ulFlags)
+      
+      PHYEndpoint<Stellaris>& endpoint,
+      unsigned long ulFIFOAddress)
   {
       MAP_USBFIFOConfigSet(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulFIFOAddress,
-          ulFIFOSize,
-          ulFlags);
+          endpoint.FIFO.SZ,
+          endpoint.FIFO.CFG_FLAGS);
   }
 
   static void FIFOFlush(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
-      MAP_USBFIFOFlush(ulBase, ulEndpoint, ulFlags);
+      MAP_USBFIFOFlush(endpoint.USB_BASE, endpoint.ALIAS, ulFlags);
   }
 
-  static unsigned long FrameNumberGet(unsigned long ulBase)
+  static unsigned long FrameNumberGet(PHYEndpointBase<Stellaris>& endpoint)
   {
-      return MAP_USBFrameNumberGet(ulBase);
+      return MAP_USBFrameNumberGet(endpoint.USB_BASE);
   }
 
-  static unsigned long HostAddrGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+  static unsigned long HostAddrGet(    
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
-      return MAP_USBHostAddrGet(ulBase, ulEndpoint, ulFlags);
+      return MAP_USBHostAddrGet(endpoint.USB_BASE, endpoint.ALIAS, ulFlags);
   }
 
   static void HostAddrSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulAddr,
       unsigned long ulFlags)
   {
-      MAP_USBHostAddrSet(ulBase, ulEndpoint, ulAddr, ulFlags);
+      MAP_USBHostAddrSet(endpoint.USB_BASE, endpoint.ALIAS, ulAddr, ulFlags);
   }
 
   static void HostEndpointConfig(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulMaxPayload,
       unsigned long ulNAKPollInterval,
       unsigned long ulTargetEndpoint,
       unsigned long ulFlags)
   {
       USBHostEndpointConfig(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulMaxPayload,
           ulNAKPollInterval,
           ulTargetEndpoint,
@@ -539,191 +217,207 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
   }
 
   static void HostEndpointDataAck(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
+      
+      PHYEndpointBase<Stellaris>& endpoint)
   {
-      MAP_USBHostEndpointDataAck(ulBase, ulEndpoint);
+      MAP_USBHostEndpointDataAck(endpoint.USB_BASE, endpoint.ALIAS);
   }
 
   static void HostEndpointDataToggle(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       bool bDataToggle,
       unsigned long ulFlags)
   {
       MAP_USBHostEndpointDataToggle(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           bDataToggle,
           ulFlags);
   }
 
   static void HostEndpointStatusClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
       MAP_USBHostEndpointStatusClear(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulFlags);
   }
 
-  static unsigned long DevAddrGet(unsigned long ulBase)
+  static unsigned long DevAddrGet(PHYEndpointBase<Stellaris>& endpoint)
   {
-      return MAP_USBDevAddrGet(ulBase);
+      return MAP_USBDevAddrGet(endpoint.USB_BASE);
   }
 
   static void DevAddrSet(
-      unsigned long ulBase,
+      PHYEndpointBase<Stellaris>& endpoint,     
       unsigned long ulAddress)
   {
-      MAP_USBDevAddrSet(ulBase, ulAddress);
+      MAP_USBDevAddrSet(endpoint.USB_BASE, ulAddress);
   }
 
-  static void DevConnect(unsigned long ulBase)
+  static void DevConnect(PHYEndpointBase<Stellaris>& endpoint)
   {
-      MAP_USBDevConnect(ulBase);
+      MAP_USBDevConnect(endpoint.USB_BASE);
   }
 
-  static void DevDisconnect(unsigned long ulBase)
+  static void DevDisconnect(PHYEndpointBase<Stellaris>& endpoint)
   {
-      MAP_USBDevDisconnect(ulBase);
+      MAP_USBDevDisconnect(endpoint.USB_BASE);
   }
 
   static void DevEndpointConfigGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long* pulMaxPacketSize,
       unsigned long* pulFlags)
   {
       MAP_USBDevEndpointConfigGet(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           pulMaxPacketSize,
           pulFlags);
   }
 
   static void DevEndpointConfigSet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
-      unsigned long ulMaxPacketSize,
-      unsigned long ulFlags)
+      
+      PHYEndpoint<Stellaris>& endpoint)
   {
       MAP_USBDevEndpointConfigSet(
-          ulBase,
-          ulEndpoint,
-          ulMaxPacketSize,
-          ulFlags);
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
+          endpoint.SZ,
+          endpoint.CFG_FLAGS);
   }
 
   static void DevEndpointDataAck(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      PHYEndpointBase<Stellaris>& endpoint,
       bool bIsLastPacket)
   {
       MAP_USBDevEndpointDataAck(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           bIsLastPacket);
   }
 
   static void DevEndpointStall(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      const PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
       MAP_USBDevEndpointStall(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulFlags);
   }
 
   static void DevEndpointStallClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      const PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
       MAP_USBDevEndpointStallClear(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulFlags);
   }
 
   static void DevEndpointStatusClear(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned long ulFlags)
   {
       MAP_USBDevEndpointStatusClear(
-          ulBase,
-          ulEndpoint,
+          endpoint.USB_BASE,
+          endpoint.ALIAS,
           ulFlags);
   }
 
-  static void DevMode(unsigned long ulBase)
+  static void DevMode(PHYEndpointBase<Stellaris>& endpoint)
   {
-      MAP_USBDevMode(ulBase);
+      MAP_USBDevMode(endpoint.USB_BASE);
   }
 
   static unsigned long EndpointDataAvail(
-      unsigned long ulBase,
-      unsigned long ulEndpoint)
+     const PHYEndpointBase<Stellaris>& endpoint )
   {
       return MAP_USBEndpointDataAvail(
-          ulBase,
-          ulEndpoint);
+          endpoint.USB_BASE,
+          endpoint.ALIAS);
   }
-
+  static unsigned long EndpointDataAvail(
+   const   PHYControlEndpoint<Stellaris>& endpoint)
+  {
+      return MAP_USBEndpointDataAvail(
+          endpoint.USB_BASE,
+          endpoint.ALIAS);
+  }
   static long EndpointDataGet(
-      unsigned long ulBase,
-      unsigned long ulEndpoint,
+      PHYEndpointBase<Stellaris>& endpoint,
       unsigned char* pucData,
       unsigned long* pulSize)
     {
         return MAP_USBEndpointDataGet(
-            ulBase,
-            ulEndpoint,
+            endpoint.USB_BASE,
+            endpoint.ALIAS,
             pucData,
             pulSize);
     }
 
     static long EndpointDataPut(
-        unsigned long ulBase,
-        unsigned long ulEndpoint,
+        PHYEndpointBase<Stellaris>& endpoint,
         unsigned char* pucData,
         unsigned long ulSize)
     {
         return MAP_USBEndpointDataPut(
-            ulBase,
-            ulEndpoint,
+            endpoint.USB_BASE,
+            endpoint.ALIAS,
             pucData,
             ulSize);
     }
 
     static long EndpointDataSend(
-        unsigned long ulBase,
-        unsigned long ulEndpoint,
+        
+        PHYEndpointBase<Stellaris>& endpoint,
         unsigned long ulTransType)
     {
         return MAP_USBEndpointDataSend(
-            ulBase,
-            ulEndpoint,
+            endpoint.USB_BASE,
+            endpoint.ALIAS,
             ulTransType);
     }
-static void SelectEndpoit(uint32_t epn){
+static void SelectEndpoit(PHYEndpointBase<Stellaris>& endpoint){
 
-        USB0_EPIDX_R=epn;
+//        USB0_EPIDX_R=epn;
+        *((uint32_t*)(endpoint.USB_BASE+USBVndCnst::USB_REG(USBVndCnst::MyUSB_REG::EPIDX)))=endpoint.IDX;
       }
 
-  };*/
-//};
+static void SetEndpoitFIFO_Size(
+        PHYEndpoint<Stellaris>& endpoint)
+    {
+    uint8_t ep_dir=endpoint.ADDR>>8;
 
+       *(
+          (uint32_t*)(endpoint.USB_BASE+USBVndCnst::EP_REG(
+                                                (endpoint.IDX, (ep_dir==8?USBVndCnst::MyUSB_EP_REG::TXMAXP:
+                                                                               USBVndCnst::MyUSB_EP_REG::RXMAXP
+                                                                               )
+                                               )
+                     )
+        )=endpoint.FIFO.SZ;
+    }
+static  constexpr unsigned COMInterruptIndex(uint32_t int_COM_status)//плучаем номер младшего установленного бита
+    {                                     //на этапе компиляции вычислит и присвоит лямбды в какомто порядке- не важно
+        unsigned b = std::__countr_zero(int_COM_status);
 
-
-
-
-
-
-
+        return (b < 16) ? (b - 1)       // IN
+                        : (31 - b + 15);// OUT
+    }
+    static void EP_StatusClear(PHYEndpointBase<Stellaris>& ep){
+    uint32_t st  = MAP_USBEndpointStatus(ep.USB_BASE, ep.ALIAS);
+    MAP_USBDevEndpointStatusClear(ep.USB_BASE, ep.ALIAS, st);
+}
+  };//USB
+};//WRAP
 

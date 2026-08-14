@@ -7,6 +7,12 @@
     gcc_omit_frame_pointer="Yes"
     gcc_optimization_level="None" />
   <configuration
+    Name="DebugSmall"
+    c_preprocessor_definitions="DEBUG"
+    gcc_debugging_level="Level 3"
+    gcc_omit_frame_pointer="Yes"
+    gcc_optimization_level="Level 2 balanced" />
+  <configuration
     Name="Release"
     c_preprocessor_definitions="NDEBUG"
     gcc_debugging_level="Level 2"
@@ -81,6 +87,8 @@
       <file file_name="periferalInterruptsHandlers.hpp" />
       <file file_name="periferalISR.hpp" />
       <file file_name="serial_print.hpp" />
+      <file file_name="StellarisDefinition.hpp" />
+      <file file_name="StellarisDefinitionView.hpp" />
       <file file_name="USB_CLASSES.hpp" />
       <file file_name="USB_CONSTS.hpp" />
       <file file_name="USB_THIS_PROGRAM_DEFS.hpp" />
@@ -106,5 +114,8 @@
       <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name="VendorConstsGenerators/Stellaris/gen_usb_defs.py" />
+    <file file_name="VendorConstsGenerators/Stellaris/gen_usb_regs.py" />
+    <file file_name="VendorConstsGenerators/generator_VendorConsts.py" />
   </project>
 </solution>

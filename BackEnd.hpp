@@ -1,10 +1,15 @@
 #pragma once
 #include<cstdint>
+#include "USB_CLASSES.hpp"
+
 template <class USBBackEnd,class TargetMCU>
 class MyUSB
 {
 public:
+static constexpr uint16_t EndpointConfig(PHYEndpoint<TargetMCU>& ep, uint32_t fifo_shift){
 
+USBBackEnd::EndpointConfig( ep,fifo_shift);
+};
 
   static uint32_t IntStatusControl(unsigned long ulBase)
   {
@@ -50,60 +55,61 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void EndpointDataToggleClear(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::EndpointDataToggleClear(base, VendorConsts<TargetMCU>::Endpoint(endpoint), flags);
+        USBBackEnd::EndpointDataToggleClear(base, endpoint, flags);
     }
 
     static void EndpointDMAChannel(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long channel)
     {
-        USBBackEnd::EndpointDMAChannel(base,VendorConsts<TargetMCU>::Endpoint(endpoint), channel);
+        USBBackEnd::EndpointDMAChannel(base,endpoint, channel);
     }
 
     static void EndpointDMADisable(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::EndpointDMADisable(base, VendorConsts<TargetMCU>::Endpoint(endpoint), flags);
+        USBBackEnd::EndpointDMADisable(base,endpoint, flags);
     }
 
     static void EndpointDMAEnable(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::EndpointDMAEnable(base, VendorConsts<TargetMCU>::Endpoint(endpoint), flags);
+        USBBackEnd::EndpointDMAEnable(base,endpoint, flags);
     }
 
     static unsigned long EndpointStatus(
         unsigned long base,
-        MyUSB_EP endpoint)
+         PHYEndpoint<TargetMCU>& endpoint)
     {
-        return USBBackEnd::EndpointStatus(base, VendorConsts<TargetMCU>::Endpoint(endpoint));
+        return USBBackEnd::EndpointStatus(base, endpoint);
     }
 
     static unsigned long FIFOAddrGet(
         unsigned long base,
-        MyUSB_EP endpoint)
+
+        PHYEndpoint<TargetMCU>& endpoint)
     {
-        return USBBackEnd::FIFOAddrGet(base, VendorConsts<TargetMCU>::Endpoint(endpoint));
+        return USBBackEnd::FIFOAddrGet(base, endpoint);
     }
 
     static void FIFOConfigGet(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long* fifoAddress,
         unsigned long* fifoSize,
         unsigned long flags)
     {
         USBBackEnd::FIFOConfigGet(
             base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             fifoAddress,
             fifoSize,
             flags);
@@ -111,14 +117,14 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void FIFOConfigSet(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long fifoAddress,
         unsigned long fifoSize,
         unsigned long flags)
     {
         USBBackEnd::FIFOConfigSet(
             base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             fifoAddress,
             fifoSize,
             flags);
@@ -126,10 +132,10 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void FIFOFlush(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::FIFOFlush(base, VendorConsts<TargetMCU>::Endpoint(endpoint), flags);
+        USBBackEnd::FIFOFlush(base,endpoint, flags);
     }
 
     static unsigned long FrameNumberGet(unsigned long base)
@@ -139,28 +145,28 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static unsigned long HostAddrGet(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        return USBBackEnd::HostAddrGet(base, VendorConsts<USBBackEnd>::Endpoint(endpoint), flags);
+        return USBBackEnd::HostAddrGet(base, endpoint, flags);
     }
 
     static void HostAddrSet(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long address,
         unsigned long flags)
     {
         USBBackEnd::HostAddrSet(
             base,
-            VendorConsts<USBBackEnd>::Endpoint(endpoint),
+            endpoint,
             address,
             flags);
     }
 
     static void HostEndpointConfig(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long maxPayload,
         unsigned long nakPollInterval,
         unsigned long targetEndpoint,
@@ -168,7 +174,7 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
     {
         USBBackEnd::HostEndpointConfig(
             base,
-            VendorConsts<USBBackEnd>::Endpoint(endpoint),
+            endpoint,
             maxPayload,
             nakPollInterval,
             targetEndpoint,
@@ -177,27 +183,27 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void HostEndpointDataAck(
         unsigned long base,
-        MyUSB_EP endpoint)
+         PHYEndpoint<TargetMCU>&endpoint)
     {
-        USBBackEnd::HostEndpointDataAck(base, VendorConsts<USBBackEnd>::Endpoint(endpoint));
+        USBBackEnd::HostEndpointDataAck(base, endpoint);
     }
 
     static void HostEndpointDataToggle(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>&endpoint,
         bool dataToggle,
         unsigned long flags)
     {
         USBBackEnd::HostEndpointDataToggle(
             base,
-            VendorConsts<USBBackEnd>::Endpoint(endpoint),
+            endpoint,
             dataToggle,
             flags);
     }
 
     static void HostEndpointStatusClear(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>&endpoint,
         unsigned long flags)
     {
         USBBackEnd::HostEndpointStatusClear(
@@ -230,71 +236,61 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void DevEndpointConfigGet(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long* maxPacketSize,
         unsigned long* flags)
     {
         USBBackEnd::DevEndpointConfigGet(
             base,
-            VendorConsts<USBBackEnd>::Endpoint(endpoint),
+            endpoint,
             maxPacketSize,
             flags);
     }
 
     static void DevEndpointConfigSet(
-        unsigned long base,
-        MyUSB_EP endpoint,
-        unsigned long maxPacketSize,
-        unsigned long flags)
+        PHYEndpoint<TargetMCU>& endpoint)
     {
         USBBackEnd::DevEndpointConfigSet(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
-            maxPacketSize,
-            flags);
+            endpoint);
     }
 
     static void DevEndpointDataAck(
-        unsigned long base,
-        MyUSB_EP endpoint,
+        const PHYEndpointBase<TargetMCU>& endpoint,
         bool isLastPacket)
     {
         USBBackEnd::DevEndpointDataAck(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             isLastPacket);
     }
 
+
     static void DevEndpointStall(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpointBase<TargetMCU>& endpoint,
         unsigned long flags)
     {
         USBBackEnd::DevEndpointStall(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             flags);
     }
 
     static void DevEndpointStallClear(
-        unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpointBase<TargetMCU>& endpoint,
         unsigned long flags)
     {
         USBBackEnd::DevEndpointStallClear(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             flags);
     }
 
     static void DevEndpointStatusClear(
         unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
         USBBackEnd::DevEndpointStatusClear(
             base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             flags);
     }
 
@@ -305,51 +301,72 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static unsigned long EndpointDataAvail(
         unsigned long base,
-        MyUSB_EP endpoint)
+       const  PHYEndpoint<TargetMCU>& endpoint)
     {
-        return USBBackEnd::EndpointDataAvail(base, VendorConsts<TargetMCU>::Endpoint(endpoint));
+        return USBBackEnd::EndpointDataAvail(base,endpoint);
     }
-
-    static long EndpointDataGet(
+    static unsigned long EndpointDataAvail(
         unsigned long base,
-        MyUSB_EP endpoint,
+       const  PHYControlEndpoint<TargetMCU>& endpoint)
+    {
+        return USBBackEnd::EndpointDataAvail(base, endpoint);
+    }
+    static long EndpointDataGet(
+         PHYEndpointBase<TargetMCU>& endpoint,
         unsigned char* data,
         unsigned long* size)
     {
         return USBBackEnd::EndpointDataGet(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             data,
             size);
     }
 
     static long EndpointDataPut(
-        unsigned long base,
-        MyUSB_EP endpoint,
+        PHYEndpointBase<TargetMCU>& endpoint,
         unsigned char* data,
         unsigned long size)
     {
         return USBBackEnd::EndpointDataPut(
-            base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             data,
             size);
     }
 
     static long EndpointDataSend(
         unsigned long base,
-        MyUSB_EP endpoint,
+         PHYEndpoint<TargetMCU>& endpoint,
         unsigned long transferType)
     {
         return USBBackEnd::EndpointDataSend(
             base,
-            VendorConsts<TargetMCU>::Endpoint(endpoint),
+            endpoint,
             transferType);
     }
 
        static void SelectEndpoit(
-        uint8_t epn)
+         uint32_t base,PHYEndpoint<TargetMCU>& epn)
     {
-        USBBackEnd::SelectEndpoit( epn);
+        USBBackEnd::SelectEndpoit(base, epn);
+    }  
+    
+      
+       static void SetEndpoitFIFO_Size(
+        PHYEndpoint<TargetMCU>& epn,size_t size)
+    {
+        USBBackEnd::SelectEndpoit( epn,size);
     }
+  static    unsigned long COMInterruptIndex(uint32_t int_COM_status)//плучаем номер младшего установленного бита
+{                                     //на этапе компиляции вычислит и присвоит лямбды в какомто порядке- не важно
+    USBBackEnd::COMInterruptIndex(int_COM_status);
+};
+
+static void UsbInit(const PHYControlEndpoint<Stellaris>& ctr_ep ){
+USBBackEnd::UsbInit( ctr_ep );
+}
+
+static void EP_StatusClear(PHYEndpointBase<TargetMCU>& ep){
+
+    USBBackEnd::EP_StatusClear(ep);
+}
 };

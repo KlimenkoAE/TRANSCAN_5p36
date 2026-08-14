@@ -129,24 +129,20 @@ def write_enum_group(
             ...
         };
 
-        static constexpr uint32_t FUNC_TABLE[] =
+        static constexpr uint32_t FUNC(...)
         {
-            ...
-        };
+            constexpr uint32_t mask[] =
+            {
+                ...
+            };
 
-        static constexpr uint32_t FUNC(MyUSB_... flag)
-        {
-            return FUNC_TABLE[static_cast<uint8_t>(flag)];
+            return mask[...];
         }
     """
 
     if not definitions:
         return
 
-
-    # --------------------------------------------------------
-    # enum
-    # --------------------------------------------------------
 
     f.write(
         f"enum class {enum_name} : uint8_t\n"
@@ -171,32 +167,6 @@ def write_enum_group(
     f.write("};\n\n")
 
 
-    # --------------------------------------------------------
-    # Public constexpr table
-    # --------------------------------------------------------
-
-    f.write(
-        f"static constexpr uint32_t "
-        f"{function_name}_TABLE[] =\n"
-    )
-
-    f.write("{\n")
-
-
-    for name, value in definitions:
-
-        f.write(
-            f"    {name},\n"
-        )
-
-
-    f.write("};\n\n")
-
-
-    # --------------------------------------------------------
-    # Accessor
-    # --------------------------------------------------------
-
     f.write(
         f"static constexpr uint32_t "
         f"{function_name}({enum_name} flag)\n"
@@ -205,9 +175,23 @@ def write_enum_group(
     f.write("{\n")
 
     f.write(
-        f"    return {function_name}_TABLE["
-        f"static_cast<uint8_t>(flag)"
-        f"];\n"
+        "    constexpr uint32_t mask[] =\n"
+    )
+
+    f.write("    {\n")
+
+
+    for name, value in definitions:
+
+        f.write(
+            f"        {name},\n"
+        )
+
+
+    f.write("    };\n")
+
+    f.write(
+        "    return mask[static_cast<uint8_t>(flag)];\n"
     )
 
     f.write("}\n\n")
@@ -253,6 +237,7 @@ ep_definitions.sort(
 
 ep_in = []
 
+
 if "USB_INTEP_0" in define_map:
 
     ep_in.append(
@@ -293,6 +278,7 @@ ep_in.sort(
 # ============================================================
 
 ep_out = []
+
 
 if "USB_INTEP_0" in define_map:
 
