@@ -12,6 +12,7 @@ extern "C"{
 #include "interrupt.h"
 #include "usb.h"
 #include "hw_usb.h"
+#include "rom_map.h"
 #endif
 }
 #include <cstdint>
@@ -53,13 +54,13 @@ uint32_t IDX;
 uint32_t ALIAS;//USB_EP_N - Stellaris !=EP_IDX 
 uint32_t SZ;//number 16/64/
 uint32_t INTEP;//interrupt
+uint32_t CFG_FLAGS;
 uint8_t  ADDR;
 
 };
 
 template <typename T>
 struct PHYEndpoint:PHYEndpointBase<T>{
-uint32_t CFG_FLAGS;
 USB_FIFO<T> FIFO;
 };
 template <typename T>

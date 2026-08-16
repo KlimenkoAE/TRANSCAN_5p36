@@ -114,6 +114,7 @@
       <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name="VendorConstsGenerators/Stellaris/gen_hw_ints.py" />
     <file file_name="VendorConstsGenerators/Stellaris/gen_usb_defs.py" />
     <file file_name="VendorConstsGenerators/Stellaris/gen_usb_regs.py" />
     <file file_name="VendorConstsGenerators/generator_VendorConsts.py" />

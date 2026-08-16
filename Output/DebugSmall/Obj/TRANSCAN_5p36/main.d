@@ -474,9 +474,10 @@ Output/DebugSmall/Obj/TRANSCAN_5p36/main.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/lm3s5p36.h \
   ../StellarisWare/inc/hw_ints.h ../StellarisWare/inc/hw_uart.h \
   ../StellarisWare/driverlib/interrupt.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \

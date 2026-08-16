@@ -95,7 +95,7 @@ int main(){
 /*//PLL 20 MHz 400/8
 SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL |SYSCTL_OSC_MAIN |
                    SYSCTL_XTAL_16MHZ);*/
-
+ //MAP_IntMasterDisable();
 //PLL 50 MHz                 
 SysCtlClockSet(
     SYSCTL_SYSDIV_4 |
@@ -105,9 +105,10 @@ SysCtlClockSet(
 SysCtlPeripheralClockGating(true);
 uint32_t dbg = SysCtlClockGet();
 
+MAP_SysCtlPeripheralEnable(CONTROL_EP.INIT_DATA.SysCtlPeriferal );
   //common timer us
   /////////////////
-  TimerPeriodic_us<
+  /*TimerPeriodic_us<
   TIMER0_BASE
   ,TIMER_CFG_32_BIT_PER
   , SYSCTL_PERIPH_TIMER0
@@ -116,20 +117,36 @@ uint32_t dbg = SysCtlClockGet();
   ,1
   ,10,100,1000,10000,100000,1000000> T_us;
 
-T_us.Disable();
+T_us.Disable();*/
+ MAP_IntMasterEnable();
+bool T1=false;
+bool T2=false;
+ 
 
 
+  CDC
+  <
+  CONTROL_EP,
+  CDC_INIT   
+  > CDC0(T1,T2);//(T_us.IntFlag(0),T_us.IntFlag(5));
 
-  USB<
+ 
+ 
+   USB<
   CONTROL_EP,
   CDC_DEVICE_CLASS //
   >USB0;
+
+
 uint8_t df1,df2;
+  
+  
+
+
+
+
   //cdc 0
-  CDC
-  <
-  CDC_INIT   
-  > CDC0(T_us.IntFlag(0),T_us.IntFlag(5));
+
 
 
 
@@ -142,6 +159,9 @@ uint8_t df1,df2;
 
 
   while(1) {
+
+
+
 
   }
 };

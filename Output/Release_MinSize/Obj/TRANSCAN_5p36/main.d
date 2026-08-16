@@ -1,13 +1,7 @@
-Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_UCB.cpp \
-  ../StellarisWare/inc/hw_types.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
-  ../StellarisWare/driverlib/usb.h ../StellarisWare/inc/hw_usb.h \
-  ../StellarisWare/driverlib/sysctl.h ../StellarisWare/inc/hw_ints.h \
-  ../StellarisWare/driverlib/rom.h ../StellarisWare/driverlib/rom_map.h \
-  ../StellarisWare/inc/hw_memmap.h \
-  ../StellarisWare/driverlib/interrupt.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
+Output/Release_MinSize/Obj/TRANSCAN_5p36/main.bc: \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/main.cpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/fifo_ring.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdint.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__config_site \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/abi.h \
@@ -15,15 +9,19 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/platform.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/availability.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__configuration/language.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdint.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_ConfDefaults.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Conf.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Arm_Conf.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdint \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdint.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdint.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdbool \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdbool.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/serial_print.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
+  ../StellarisWare/inc/hw_types.h ../StellarisWare/driverlib/sysctl.h \
+  ../StellarisWare/inc/hw_sysctl.h ../StellarisWare/driverlib/uart.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdlib.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdlib.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/functional \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/binary_function.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/binary_negate.h \
@@ -113,6 +111,7 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_swappable.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_trivially_relocatable.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_trivially_copyable.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdint \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/lazy.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/maybe_const.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/negation.h \
@@ -330,8 +329,6 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/remainder.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/rounding_functions.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__math/trigonometric_functions.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdlib.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdlib.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__iterator/erase_if_container.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__iterator/ranges_iterator_traits.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__memory_resource/polymorphic_allocator.h \
@@ -380,6 +377,8 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/search.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/find_first_of.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdio \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/iosfwd \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/fstream.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/ios.h \
@@ -455,6 +454,40 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/perfect_forward.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_back.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__functional/bind_front.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_CDC.hpp \
+  ../StellarisWare/driverlib/usb.h ../StellarisWare/driverlib/timer.h \
+  ../StellarisWare/inc/hw_usb.h ../StellarisWare/driverlib/rom.h \
+  ../StellarisWare/driverlib/rom_map.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  ../StellarisWare/inc/hw_memmap.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/utility \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/rel_ops.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/as_const.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/cmp.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/forward_like.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/to_underlying.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/wrappers_headers.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/lm3s5p36.h \
+  ../StellarisWare/inc/hw_ints.h ../StellarisWare/inc/hw_uart.h \
+  ../StellarisWare/driverlib/interrupt.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_log2.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_width.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/endian.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/has_single_bit.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/byteswap.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/adjacent_find.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/all_of.h \
@@ -631,34 +664,6 @@ Output/Debug/Obj/TRANSCAN_5p36/_UCB.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_ends_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_starts_with.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/ranges_find_last.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalISR.hpp \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdbool.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/utility \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/rel_ops.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/as_const.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/cmp.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/forward_like.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__utility/to_underlying.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/wrappers_headers.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/lm3s5p36.h \
-  ../StellarisWare/driverlib/timer.h ../StellarisWare/inc/hw_uart.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_log2.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_width.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/endian.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/has_single_bit.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/byteswap.h
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_USB.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdbool

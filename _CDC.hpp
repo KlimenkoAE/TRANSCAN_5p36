@@ -4,6 +4,7 @@
 
 //////////////////////////////////////////////////////
 extern "C"{
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include<string.h>
@@ -70,6 +71,7 @@ struct {uint32_t dwDTERate;   // скорость, little-endian
 
 template
 <
+auto EP_CTR,
 CDC_INIT_t INIT
 >
 
@@ -92,13 +94,13 @@ public:
         ,TIMER_TX_INT_FLAG(timer_tx_f)
         ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
     {//это значения USB_INTEP_INT возвращаются в сеелларис через статус прерывания
-   USB_COM_Handlers<INIT.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_IN.IDX)),[this](){
+   USB_COM_Handlers<INIT.PHY_EP_DATA_IN.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_IN.IDX)),[this](){
   TX_InterrupHandler();
   });
-   USB_COM_Handlers<INIT.USB_BASE>::Register(USBVndCnst::INTEP_OUT(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_OUT.IDX)) ,[this](){
+   USB_COM_Handlers<INIT.PHY_EP_DATA_IN.USB_BASE>::Register(USBVndCnst::INTEP_OUT(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_OUT.IDX)) ,[this](){
   RX_InterrupHandler();
   });
-   USB_COM_Handlers<INIT.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_COMMUNICATION.IDX)) ,[this](){
+   USB_COM_Handlers<INIT.PHY_EP_COMMUNICATION.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_COMMUNICATION.IDX)) ,[this](){
   Communication_InterrupHandler();
   });
     // принимаем host status line
@@ -106,6 +108,7 @@ public:
     (
     [this](const _Buffer& su_buf, uint32_t& sup_data ){
                             this->TraceHostStatus(su_buf.wValue);
+                     //       printf("0x2221 data  \n");
                             },
                             USB_CDC_SET_CONTROL_LINE_STATE,
                             0
@@ -115,7 +118,14 @@ public:
  ExtSetupHandlerRegister
     (
     [this](const _Buffer& su_buf,uint32_t& sup_data){
-                 memcpy(this->LineCoding.arr, buffer.arr, sup_data);
+    uint32_t sz=sizeof(this->LineCoding.arr);
+
+      for (int i=0;i<sz;++i){
+//printf("0x2021 data  \n");
+      this->LineCoding.arr[i]=su_buf.arr[i];
+
+      }
+                           
                             },
                             USB_CDC_SET_LINE_CODING,
                             0
@@ -125,9 +135,8 @@ public:
  ExtSetupHandlerRegister
     (
     [this](const _Buffer& su_buf,uint32_t& sup_data){
-                MAP_USBEndpointDataPut(INIT.USB_BASE, USB_EP_0,
-                                       (uint8_t *)this->LineCoding.arr,sizeof(this->LineCoding.arr));
-                MAP_USBEndpointDataSend(INIT.USB_BASE,USB_EP_0,USB_TRANS_IN_LAST);
+                USBWRP::EndpointDataPut(EP_CTR,(uint8_t *)this->LineCoding.arr,sizeof(this->LineCoding.arr));
+                USBWRP::EndpointDataSend(EP_CTR,USB_TRANS_IN_LAST);
                             },
                             USB_CDC_GET_LINE_CODING,
                             0
@@ -137,15 +146,22 @@ public:
  ExtSetupHandlerRegister
     (
     [this](const _Buffer& su_buf,uint32_t& sup_data){
+   EP_INT_ON_OFF(false);
     	if((enum _device_state)sup_data== _device_state::Configurated){
-                Flags.all=0;
-                USBWRP::FIFOFlush(INIT.USB_BASE, INIT.PHY_EP_COMMUNICATION.ALIAS , USB_EP_DEV_IN);
-                USBWRP::FIFOFlush(INIT.USB_BASE, INIT.PHY_EP_DATA_IN.ALIAS, USB_EP_DEV_IN);
-                USBWRP::FIFOFlush(INIT.USB_BASE, INIT.PHY_EP_DATA_OUT.ALIAS, USB_EP_DEV_OUT);
+                Flags.all=0; 
+                USBWRP::FIFOFlush(INIT.PHY_EP_COMMUNICATION);
+                USBWRP::FIFOFlush(INIT.PHY_EP_DATA_IN);
+                USBWRP::FIFOFlush(INIT.PHY_EP_DATA_OUT);
                sup_data=(uint32_t)_device_state::Default;
-                }	
-               set_usb_cfg();
+                }
+                //else{
+              //  set_usb_cfg();
+               // }	                                             
                Flags.DATA_IN_ON=false;
+               sup_data=_device_state::Configurated;
+               Host_Curr_State = CDC_SS_NONE;
+               Dev_Curr_State = CDC_SS_DCD; // только присутствие
+               EP_INT_ON_OFF(true);
                             },
                             SET_CONFIGURATION,
                             0
@@ -158,6 +174,7 @@ public:
                               Flags.COMMUNICATION_BUSY = false; 
                               Flags.COMMUNICATION_INT=false;
                               USBWRP::EP_StatusClear(INIT.PHY_EP_COMMUNICATION);
+                              USBWRP::DevEndpointDataAck(INIT.PHY_EP_COMMUNICATION, true);
                             },
                             CLEAR_FEATURE_ENDPNT,
                             INIT.PHY_EP_COMMUNICATION.ADDR
@@ -165,54 +182,71 @@ public:
          ExtSetupHandlerRegister
     (
     [this](const _Buffer& su_buf,uint32_t& sup_data){
+                            
                             USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_IN);
+                            USBWRP::DevEndpointStallClear(INIT.PHY_EP_DATA_IN);
+                            USBWRP::EndpointDataToggleClear(INIT.PHY_EP_DATA_IN);
                               fr_TX.clear();
                               Flags.DATA_IN_BUSY = false; 
                               Flags.DATA_IN_INT=false;
                               Flags.PRIORITY_PENDING= false;
                               TraceHostStatus(CDC_SS_DCD_DSR);
+                              SysCtlDelay(DELAY_LOAD_1us*100);
+                              USBWRP::DevEndpointDataAck(INIT.PHY_EP_DATA_IN, true);
                             },
                             CLEAR_FEATURE_ENDPNT,
                             INIT.PHY_EP_DATA_IN.ADDR
     );
+
          ExtSetupHandlerRegister
     (
     [this](const _Buffer& su_buf,uint32_t& sup_data){
-                            USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_OUT);
+                              USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_OUT);                           
+                              USBWRP::DevEndpointStallClear(INIT.PHY_EP_DATA_OUT);
+                              USBWRP::EndpointDataToggleClear(INIT.PHY_EP_DATA_OUT);
                               fr_RX.clear();
                               Flags.DATA_OUT_BUSY = false; 
                               Flags.DATA_OUT_INT=false;
+                              USBWRP::DevEndpointDataAck(INIT.PHY_EP_DATA_OUT, true);
+                              USBWRP::DevEndpointDataAck(INIT.PHY_EP_DATA_OUT, false);
                             },
                             CLEAR_FEATURE_ENDPNT,
                             INIT.PHY_EP_DATA_OUT.ADDR
-    );
-
+                            );
+set_usb_cfg();
 }//constructor
+     
+constexpr void EP_INT_ON_OFF(bool on){
+if(on)
+  {
+  USBWRP::IntEnableEndpoint(INIT.PHY_EP_COMMUNICATION);
+  USBWRP::IntEnableEndpoint(INIT.PHY_EP_DATA_IN);
+  USBWRP::IntEnableEndpoint(INIT.PHY_EP_DATA_OUT);
+  }
+else{
+  USBWRP::IntDisableEndpoint(INIT.PHY_EP_COMMUNICATION);
+  USBWRP::IntDisableEndpoint(INIT.PHY_EP_DATA_IN);
+  USBWRP::IntDisableEndpoint(INIT.PHY_EP_DATA_OUT);
+  };
+};  
                            
-void set_usb_cfg() {
-unsigned long ep_config[1];
-unsigned long max_pak_sz[1];
-unsigned long ep_status;
+constexpr void set_usb_cfg() {
+
+ uint16_t  sh =  USBWRP::EndpointConfig(INIT.PHY_EP_COMMUNICATION,EP0_SZ);
 
 
- uint16_t  sh =  USBWRP::EndpointConfig(INIT.USB_BASE,INIT.PHY_EP_COMMUNICATION,EP0_SZ);
+  sh =  USBWRP::EndpointConfig(INIT.PHY_EP_DATA_IN,sh);
 
-//while(!(USB0_TXCSRH1_R&USB_TXCSRH1_DMAEN));
-USBWRP::IntEnableEndpoint(INIT.USB_BASE,INIT.PHY_EP_COMMUNICATION.INTEP);
+  USBWRP::EndpointConfig(INIT.PHY_EP_DATA_OUT,sh);
 
-  sh =  USBWRP::EndpointConfig(INIT.USB_BASE,INIT.PHY_EP_DATA_IN,sh);
 
-USBWRP::IntEnableEndpoint(INIT.USB_BASE,INIT.PHY_EP_DATA_IN.INTEP);
-
-  USBWRP::EndpointConfig(INIT.USB_BASE,INIT.PHY_EP_DATA_OUT,sh);
-
-USBWRP::IntEnableEndpoint(INIT.USB_BASE,INIT.PHY_EP_DATA_OUT.INTEP);
 
   return;
 }
+
 ///////
 void Send_Device_State(CDC_SerialState_t b8)
-{
+{ 
 
     static uint8_t notify[10] = {
         0xA1, 0x20,
@@ -223,8 +257,8 @@ void Send_Device_State(CDC_SerialState_t b8)
     };
     notify[8] = b8;       // DCD/DSR/Break/errors
     notify[9] = 0x00;
-if(USBWRP::EndpointDataPut(INIT.USB_BASE, INIT.PHY_EP_COMMUNICATION.ALIAS, notify, 10)!=0)return;
-    USBWRP::EndpointDataSend(INIT.USB_BASE, INIT.PHY_EP_COMMUNICATION.ALIAS, USB_TRANS_IN);
+if(USBWRP::EndpointDataPut(INIT.PHY_EP_COMMUNICATION, notify, 10)!=0)return;
+    USBWRP::EndpointDataSend(INIT.PHY_EP_COMMUNICATION, USB_TRANS_IN);
 }
 
 
@@ -232,8 +266,8 @@ void TX_Immediacy( uint8_t* buf, uint32_t sz) {
     if(!Flags.DATA_IN_BUSY/*&&CDC_Host_Curr_State==CDC_SS_DCD_DSR*/) {
         // сразу отправляем первый кусок
         uint32_t chunk = (sz > INIT.PHY_EP_DATA_IN.SZ) ? INIT.PHY_EP_DATA_IN.SZ : sz;
-        USBWRP::EndpointDataPut(INIT.USB_BASE, INIT.PHY_EP_DATA_IN.ALIAS, buf, chunk);
-        USBWRP::EndpointDataSend(INIT.USB_BASE, INIT.PHY_EP_DATA_IN.ALIAS,USBVndCnst::TRANS(USBVndCnst::MyUSB_TRANS::IN));
+        USBWRP::EndpointDataPut(INIT.PHY_EP_DATA_IN, buf, chunk);
+        USBWRP::EndpointDataSend(INIT.PHY_EP_DATA_IN,USBVndCnst::TRANS(USBVndCnst::MyUSB_TRANS::IN));
         Flags.DATA_IN_BUSY = true;
         // если буфер длиннее — запомним остаток
         if(sz > chunk) {
@@ -264,22 +298,22 @@ uint16_t cnt_for_tx=0;
         return;
     }
     // Пока есть полный пакет
-    while(fr_TX->Count() >= INIT.DATA_IN_EP_SZ) {
-        uint8_t pkt[INIT.DATA_IN_EP_SZ];
+    while(fr_TX->Count() >= INIT.PHY_EP_DATA_IN.SZ) {
+        uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
 
-        cnt_for_tx =fr_TX->read_range(pkt, INIT.DATA_IN_EP_SZ);   // вытащить из кольца
+        cnt_for_tx =fr_TX->read_range(pkt, INIT.PHY_EP_DATA_IN.SZ);   // вытащить из кольца
         TX_Immediacy(pkt, cnt_for_tx);
     }
 
     // Остаток < CDC0_TX_SZ
     if(fr_TX->Count() > 0) {
-        uint8_t pkt[INIT.DATA_IN_EP_SZ];
+        uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
         cnt_for_tx = fr_TX->read_range (pkt, fr_TX->Count());
         TX_Immediacy(pkt, cnt_for_tx);
     }
-    else if(cnt_for_tx%INIT.DATA_IN_EP_SZ==0){
-     USBWRP::EndpointDataPut(INIT.USB_BASE, INIT.DATA_IN_EP, NULL, 0);
-      USBWRP::EndpointDataSend(INIT.USB_BASE, INIT.DATA_IN_EP, USB_TRANS_IN);
+    else if(cnt_for_tx%INIT.PHY_EP_DATA_IN.SZ==0){
+     USBWRP::EndpointDataPut(INIT.PHY_EP_DATA_IN, NULL, 0);
+      USBWRP::EndpointDataSend(INIT.PHY_EP_DATA_IN, USB_TRANS_IN);
       Flags.DATA_IN_BUSY = true;
     }
 }
@@ -288,12 +322,12 @@ uint16_t cnt_for_tx=0;
     if(Flags.PRIORITY_PENDING) {
         if(ImmediaetyTransferState.pr_pos < ImmediaetyTransferState.pr_len) {
             uint32_t remaining = ImmediaetyTransferState.pr_len - ImmediaetyTransferState.pr_pos;
-            uint32_t chunk = (remaining > INIT.DATA_IN_EP_SZ) ? INIT.DATA_IN_EP_SZ : remaining;
+            uint32_t chunk = (remaining > INIT.PHY_EP_DATA_IN.SZ) ? INIT.PHY_EP_DATA_IN.SZ : remaining;
 
-            USBWRP::EndpointDataPut(INIT.USB_BASE, INIT.DATA_IN_EP,
+            USBWRP::EndpointDataPut(INIT.PHY_EP_DATA_IN,
                                    ImmediaetyTransferState.pr_buf + ImmediaetyTransferState.pr_pos,
                                    chunk);
-            USBWRP::EndpointDataSend(INIT.USB_BASE, INIT.DATA_IN_EP, USB_TRANS_IN);
+            USBWRP::EndpointDataSend(INIT.PHY_EP_DATA_IN, USB_TRANS_IN);
             Flags.DATA_IN_BUSY = true;
             ImmediaetyTransferState.pr_pos += chunk;
         } else {
@@ -304,9 +338,7 @@ uint16_t cnt_for_tx=0;
 }
 
 void TX_InterrupHandler(){
-    uint32_t st  = USBWRP::EndpointStatus(INIT.USB_BASE, INIT.DATA_IN_EP);
-    USBWRP::DevEndpointStatusClear(INIT.USB_BASE, INIT.DATA_IN_EP, st);
-    
+    USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_IN); 
 
     Flags.DATA_IN_INT = true;   // бросаем флаг "было прерывание"
     Flags.DATA_IN_BUSY = false; // освобождаем endpoint
@@ -315,26 +347,24 @@ void TX_InterrupHandler(){
 }
 
 void RX_InterrupHandler(){
-   uint32_t st =USBWRP::EndpointStatus(INIT.USB_BASE, INIT.DATA_OUT_EP);
-   USBWRP::DevEndpointStatusClear(INIT.USB_BASE, INIT.DATA_OUT_EP, st);
-       unsigned long len = USBWRP::EndpointDataAvail(INIT.USB_BASE,INIT. DATA_OUT_EP);
+   USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_OUT);
+       unsigned long len = USBWRP::EndpointDataAvail(INIT.PHY_EP_DATA_OUT);
         if (len > 0)
         {
     
-            uint8_t rx_buf[INIT.DATA_OUT_EP_SZ];        
-            USBWRP::EndpointDataGet(INIT.USB_BASE, INIT.DATA_OUT_EP, rx_buf, &len);
+            uint8_t rx_buf[INIT.PHY_EP_DATA_OUT.SZ];        
+            USBWRP::EndpointDataGet(INIT.PHY_EP_DATA_OUT, rx_buf, &len);
             // Здесь извлекаю из фифо в fr_CDC_RX
             fr_RX.write_range(rx_buf,len);                 
         }
     // Обязательно разрешаем следующий приём
-     USBWRP::DevEndpointDataAck(INIT.USB_BASE, INIT.DATA_OUT_EP, false);
+     USBWRP::DevEndpointDataAck(INIT.PHY_EP_DATA_OUT, false);
      Flags.DATA_OUT_INT=true;
 
 }
 
 void Communication_InterrupHandler(){
-    uint32_t st=USBWRP::EndpointStatus(INIT.USB_BASE, INIT.COMMUNICATION_EP);
-    USBWRP::DevEndpointStatusClear(INIT.USB_BASE, INIT.COMMUNICATION_EP, st);
+    USBWRP::EP_StatusClear(INIT.PHY_EP_COMMUNICATION);
     Flags.COMMUNICATION_BUSY = false;
     Flags.COMMUNICATION_INT=true;
     }

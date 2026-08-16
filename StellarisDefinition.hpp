@@ -573,7 +573,7 @@ enum class MyFAULT : uint8_t
     BUS,
     USAGE,
     SVCALL,
-    DEBUG,
+    DBG,
     PENDSV,
     SYSTICK,
 };
@@ -641,7 +641,7 @@ enum class MyINT : uint8_t
     CAN2,
     ETH,
     HIBERNATE,
-    USB0,
+    USB0,//<<--------------44 begin0
     PWM0_3,
     UDMA,
     UDMAERR,
@@ -758,7 +758,7 @@ static constexpr uint32_t INT(MyINT flag)
         INT_CAN2,
         INT_ETH,
         INT_HIBERNATE,
-        INT_USB0,
+        INT_USB0,  ///<----44
         INT_PWM0_3,
         INT_UDMA,
         INT_UDMAERR,

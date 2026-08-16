@@ -175,7 +175,8 @@ with open(
         for name, value in faults:
 
             member = name[len("FAULT_"):]
-
+            if member == "DEBUG":
+                member = "DBG"
             f.write(
                 f"    {member},\n"
             )

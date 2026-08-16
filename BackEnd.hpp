@@ -6,108 +6,107 @@ template <class USBBackEnd,class TargetMCU>
 class MyUSB
 {
 public:
-static constexpr uint16_t EndpointConfig(PHYEndpoint<TargetMCU>& ep, uint32_t fifo_shift){
+static constexpr uint16_t EndpointConfig( const PHYEndpoint<TargetMCU>& ep, uint32_t fifo_shift){
 
-USBBackEnd::EndpointConfig( ep,fifo_shift);
+return USBBackEnd::vwEndpointConfig( ep,fifo_shift);
 };
 
-  static uint32_t IntStatusControl(unsigned long ulBase)
+  static uint32_t IntStatusControl( const PHYEndpointBase<Stellaris>& endpoint)
   {
-      return USBBackEnd::IntStatusControl(ulBase);
+      return USBBackEnd::vwIntStatusControl(endpoint);
   }
 
-  static uint32_t IntStatusEndpoint(unsigned long ulBase)
+  static uint32_t IntStatusEndpoint( const PHYEndpointBase<Stellaris>& endpoint)
   {
-      return USBBackEnd::IntStatusEndpoint(ulBase);
+      return USBBackEnd::vwIntStatusEndpoint(endpoint);
   }
 
 
-static void IntEnableEndpoint(unsigned long ulBase, unsigned long ulFlags)
+static void IntEnableEndpoint(
+ const PHYEndpointBase<TargetMCU>& endpoint)
   {
 
-      USBBackEnd::IntEnableEndpoint(ulBase, ulFlags);
+      USBBackEnd::vwIntEnableEndpoint(endpoint);
   }
 
 static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
   {
-      USBBackEnd::IntEnableControl(ulBase, ulFlags);
+      USBBackEnd::vwIntEnableControl(ulBase, ulFlags);
   }
 
     static void IntDisable(unsigned long base, unsigned long flags)
     {
-        USBBackEnd::IntDisable(base, flags);
+        USBBackEnd::vwIntDisable(base, flags);
     }
 
     static void IntDisableControl(unsigned long base, unsigned long flags)
     {
-        USBBackEnd::IntDisableControl(base, flags);
+        USBBackEnd::vwIntDisableControl(base, flags);
     }
 
-    static void IntDisableEndpoint(unsigned long base, unsigned long flags)
+    static void IntDisableEndpoint(const PHYEndpointBase<Stellaris>& endpoint)
     {
-        USBBackEnd::IntDisableEndpoint(base, flags);
+        USBBackEnd::vwIntDisableEndpoint(endpoint);
     }
 
-    static void IntEnable(unsigned long base,unsigned long flags)
+    static void USBIntEnable(unsigned long base,unsigned long flags)
     {
-        USBBackEnd::IntEnable(base, flags);
+        USBBackEnd::vwUSBIntEnable(base, flags);
     }
 
     static void EndpointDataToggleClear(
-        unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
-        unsigned long flags)
+        const PHYEndpoint<TargetMCU>& endpoint)
     {
-        USBBackEnd::EndpointDataToggleClear(base, endpoint, flags);
+        USBBackEnd::vwEndpointDataToggleClear(endpoint);
     }
 
     static void EndpointDMAChannel(
         unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long channel)
     {
-        USBBackEnd::EndpointDMAChannel(base,endpoint, channel);
+        USBBackEnd::vwEndpointDMAChannel(base,endpoint, channel);
     }
 
     static void EndpointDMADisable(
         unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::EndpointDMADisable(base,endpoint, flags);
+        USBBackEnd::vwEndpointDMADisable(base,endpoint, flags);
     }
 
     static void EndpointDMAEnable(
         unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::EndpointDMAEnable(base,endpoint, flags);
+        USBBackEnd::vwEndpointDMAEnable(base,endpoint, flags);
     }
 
     static unsigned long EndpointStatus(
-        unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint)
+         const PHYEndpoint<TargetMCU>& endpoint)
+
     {
-        return USBBackEnd::EndpointStatus(base, endpoint);
+        return USBBackEnd::vwEndpointStatus(endpoint);
     }
 
     static unsigned long FIFOAddrGet(
         unsigned long base,
 
-        PHYEndpoint<TargetMCU>& endpoint)
+        const PHYEndpoint<TargetMCU>& endpoint)
     {
-        return USBBackEnd::FIFOAddrGet(base, endpoint);
+        return USBBackEnd::vwFIFOAddrGet(base, endpoint);
     }
 
     static void FIFOConfigGet(
         unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
+        const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long* fifoAddress,
         unsigned long* fifoSize,
         unsigned long flags)
     {
-        USBBackEnd::FIFOConfigGet(
+        USBBackEnd::vwFIFOConfigGet(
             base,
             endpoint,
             fifoAddress,
@@ -117,12 +116,12 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void FIFOConfigSet(
         unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
+        const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long fifoAddress,
         unsigned long fifoSize,
         unsigned long flags)
     {
-        USBBackEnd::FIFOConfigSet(
+        USBBackEnd::vwFIFOConfigSet(
             base,
             endpoint,
             fifoAddress,
@@ -131,33 +130,31 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
     }
 
     static void FIFOFlush(
-        unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
-        unsigned long flags)
+        const PHYEndpoint<TargetMCU>& endpoint)
     {
-        USBBackEnd::FIFOFlush(base,endpoint, flags);
+        USBBackEnd::vwFIFOFlush(endpoint);
     }
 
     static unsigned long FrameNumberGet(unsigned long base)
     {
-        return USBBackEnd::FrameNumberGet(base);
+        return USBBackEnd::vwFrameNumberGet(base);
     }
 
     static unsigned long HostAddrGet(
         unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        return USBBackEnd::HostAddrGet(base, endpoint, flags);
+        return USBBackEnd::vwHostAddrGet(base, endpoint, flags);
     }
 
     static void HostAddrSet(
         unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long address,
         unsigned long flags)
     {
-        USBBackEnd::HostAddrSet(
+        USBBackEnd::vwHostAddrSet(
             base,
             endpoint,
             address,
@@ -166,13 +163,13 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void HostEndpointConfig(
         unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
+        const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long maxPayload,
         unsigned long nakPollInterval,
         unsigned long targetEndpoint,
         unsigned long flags)
     {
-        USBBackEnd::HostEndpointConfig(
+        USBBackEnd::vwHostEndpointConfig(
             base,
             endpoint,
             maxPayload,
@@ -183,18 +180,18 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void HostEndpointDataAck(
         unsigned long base,
-         PHYEndpoint<TargetMCU>&endpoint)
+         const PHYEndpoint<TargetMCU>&endpoint)
     {
-        USBBackEnd::HostEndpointDataAck(base, endpoint);
+        USBBackEnd::vwHostEndpointDataAck(base, endpoint);
     }
 
     static void HostEndpointDataToggle(
         unsigned long base,
-         PHYEndpoint<TargetMCU>&endpoint,
+         const PHYEndpoint<TargetMCU>&endpoint,
         bool dataToggle,
         unsigned long flags)
     {
-        USBBackEnd::HostEndpointDataToggle(
+        USBBackEnd::vwHostEndpointDataToggle(
             base,
             endpoint,
             dataToggle,
@@ -203,10 +200,10 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static void HostEndpointStatusClear(
         unsigned long base,
-         PHYEndpoint<TargetMCU>&endpoint,
+         const PHYEndpoint<TargetMCU>&endpoint,
         unsigned long flags)
     {
-        USBBackEnd::HostEndpointStatusClear(
+        USBBackEnd::vwHostEndpointStatusClear(
             base,
             endpoint,
             flags);
@@ -214,33 +211,33 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
 
     static unsigned long DevAddrGet(unsigned long base)
     {
-        return USBBackEnd::DevAddrGet(base);
+        return USBBackEnd::vwDevAddrGet(base);
     }
 
     static void DevAddrSet(
-        unsigned long base,
+        const PHYEndpointBase<Stellaris>& endpoint,
         unsigned long address)
     {
-        USBBackEnd::DevAddrSet(base, address);
+        USBBackEnd::vwDevAddrSet(endpoint, address);
     }
 
     static void DevConnect(unsigned long base)
     {
-        USBBackEnd::DevConnect(base);
+        USBBackEnd::vwDevConnect(base);
     }
 
     static void DevDisconnect(unsigned long base)
     {
-        USBBackEnd::DevDisconnect(base);
+        USBBackEnd::vwDevDisconnect(base);
     }
 
     static void DevEndpointConfigGet(
         unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
+        const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long* maxPacketSize,
         unsigned long* flags)
     {
-        USBBackEnd::DevEndpointConfigGet(
+        USBBackEnd::vwDevEndpointConfigGet(
             base,
             endpoint,
             maxPacketSize,
@@ -248,125 +245,114 @@ static void IntEnableControl(unsigned long ulBase, unsigned long ulFlags)
     }
 
     static void DevEndpointConfigSet(
-        PHYEndpoint<TargetMCU>& endpoint)
+        const PHYEndpoint<TargetMCU>& endpoint)
     {
-        USBBackEnd::DevEndpointConfigSet(
+        USBBackEnd::vwDevEndpointConfigSet(
             endpoint);
     }
 
     static void DevEndpointDataAck(
-        const PHYEndpointBase<TargetMCU>& endpoint,
+         const PHYEndpointBase<TargetMCU>& endpoint,
         bool isLastPacket)
     {
-        USBBackEnd::DevEndpointDataAck(
+        USBBackEnd::vwDevEndpointDataAck(
             endpoint,
             isLastPacket);
     }
 
 
     static void DevEndpointStall(
-        unsigned long base,
-         PHYEndpointBase<TargetMCU>& endpoint,
-        unsigned long flags)
+         const PHYEndpointBase<TargetMCU>& endpoint)
     {
-        USBBackEnd::DevEndpointStall(
-            endpoint,
-            flags);
+        USBBackEnd::vwDevEndpointStall(
+            endpoint);
     }
 
     static void DevEndpointStallClear(
-         PHYEndpointBase<TargetMCU>& endpoint,
-        unsigned long flags)
+         const PHYEndpointBase<TargetMCU>& endpoint)
     {
-        USBBackEnd::DevEndpointStallClear(
-            endpoint,
-            flags);
+        USBBackEnd::vwDevEndpointStallClear(
+            endpoint);
     }
 
     static void DevEndpointStatusClear(
-        unsigned long base,
-        PHYEndpoint<TargetMCU>& endpoint,
+        const PHYEndpoint<TargetMCU>& endpoint,
         unsigned long flags)
     {
-        USBBackEnd::DevEndpointStatusClear(
-            base,
+        USBBackEnd::vwDevEndpointStatusClear(
             endpoint,
             flags);
     }
 
     static void DevMode(unsigned long base)
     {
-        USBBackEnd::DevMode(base);
+        USBBackEnd::vwDevMode(base);
     }
 
     static unsigned long EndpointDataAvail(
-        unsigned long base,
-       const  PHYEndpoint<TargetMCU>& endpoint)
+         const PHYEndpointBase<TargetMCU>& endpoint)
     {
-        return USBBackEnd::EndpointDataAvail(base,endpoint);
+        return USBBackEnd::vwEndpointDataAvail(endpoint);
     }
     static unsigned long EndpointDataAvail(
         unsigned long base,
-       const  PHYControlEndpoint<TargetMCU>& endpoint)
+         const PHYControlEndpoint<TargetMCU>& endpoint)
     {
-        return USBBackEnd::EndpointDataAvail(base, endpoint);
+        return USBBackEnd::vwEndpointDataAvail(endpoint);
     }
     static long EndpointDataGet(
-         PHYEndpointBase<TargetMCU>& endpoint,
+         const PHYEndpointBase<TargetMCU>& endpoint,
         unsigned char* data,
         unsigned long* size)
     {
-        return USBBackEnd::EndpointDataGet(
+        return USBBackEnd::vwEndpointDataGet(
             endpoint,
             data,
             size);
     }
 
     static long EndpointDataPut(
-        PHYEndpointBase<TargetMCU>& endpoint,
+         const PHYEndpointBase<TargetMCU>& endpoint,
         unsigned char* data,
         unsigned long size)
     {
-        return USBBackEnd::EndpointDataPut(
+        return USBBackEnd::vwEndpointDataPut(
             endpoint,
             data,
             size);
     }
 
     static long EndpointDataSend(
-        unsigned long base,
-         PHYEndpoint<TargetMCU>& endpoint,
+         const PHYEndpointBase<TargetMCU>& endpoint,
         unsigned long transferType)
     {
-        return USBBackEnd::EndpointDataSend(
-            base,
+        return USBBackEnd::vwEndpointDataSend(
             endpoint,
             transferType);
     }
 
-       static void SelectEndpoit(
-         uint32_t base,PHYEndpoint<TargetMCU>& epn)
+       static void SelectEndpoit(const PHYEndpoint<TargetMCU>& epn)
     {
-        USBBackEnd::SelectEndpoit(base, epn);
+        USBBackEnd::vwSelectEndpoit( epn);
     }  
     
       
        static void SetEndpoitFIFO_Size(
-        PHYEndpoint<TargetMCU>& epn,size_t size)
+        const PHYEndpoint<TargetMCU>& epn,size_t size)
     {
-        USBBackEnd::SelectEndpoit( epn,size);
+        USBBackEnd::vwSelectEndpoit( epn,size);
     }
   static    unsigned long COMInterruptIndex(uint32_t int_COM_status)//плучаем номер младшего установленного бита
 {                                     //на этапе компиляции вычислит и присвоит лямбды в какомто порядке- не важно
-    USBBackEnd::COMInterruptIndex(int_COM_status);
+  return  USBBackEnd::vwCOMInterruptIndex(int_COM_status);
 };
 
-static void UsbInit(const PHYControlEndpoint<Stellaris>& ctr_ep ){
-USBBackEnd::UsbInit( ctr_ep );
+static void UsbInit( const PHYControlEndpoint<Stellaris>& ctr_ep ){
+USBBackEnd::vwUsbInit( ctr_ep );
 }
 
-static void EP_StatusClear(PHYEndpointBase<TargetMCU>& ep){
+static void EP_StatusClear(  const PHYEndpoint<TargetMCU>& ep){
 
-    USBBackEnd::EP_StatusClear(ep);
+    USBBackEnd::vwEP_StatusClear(ep);
 }
 };

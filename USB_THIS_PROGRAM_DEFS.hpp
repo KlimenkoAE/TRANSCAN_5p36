@@ -64,6 +64,7 @@ constexpr PHYControlEndpoint<Stellaris> CONTROL_EP{
 . ALIAS= USBVndCnst::Endpoint(EP00_IDX), 
 . SZ=EP0_SZ,//number 16/64/
 . INTEP=USBVndCnst::INTEP_IN(EP00_IDX),//interrupt
+.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_CTRL)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_OUT),
 .  ADDR=0x80
 },
 .INIT_DATA.INT_USBDevice=USBVndCnst::INT(USBVndCnst::MyINT::USB0),
@@ -84,14 +85,13 @@ constexpr PHYEndpoint<Stellaris> PHY_EP02={
 .IDX=static_cast<uint32_t>(EP02_IDX),
 .ALIAS=USBVndCnst::Endpoint(EP02_IDX),//USB_EP_N - Stellaris !=EP_IDX 
 .SZ=64,//number 16/64/
-.INTEP=USBVndCnst::INTEP_OUT(EP02_IDX),//interrupt
+.INTEP=USBVndCnst::INTEP_OUT(EP02_IDX),
+.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_BULK)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_OUT),
 .ADDR=_EP_OUT(EP02_IDX)
 },
 .FIFO.SZ=USBVndCnst::FIFO_SIZE(USBVndCnst::MyUSB_FIFO_SIZE::SZ_64),//vendor const
 .FIFO.DoubleBuffered=false,
-.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_BULK)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_OUT),
 .FIFO.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_OUT)
-
 };
 constexpr PHYEndpoint<Stellaris> PHY_EP82={
 {
@@ -100,11 +100,11 @@ constexpr PHYEndpoint<Stellaris> PHY_EP82={
 . ALIAS=USBVndCnst::Endpoint(EP82_IDX),//USB_EP_N - Stellaris !=EP_IDX 
 . SZ=64,//number 16/64/
 . INTEP=USBVndCnst::INTEP_IN(EP82_IDX),
+. CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_BULK)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN),
 . ADDR=_EP_IN(EP82_IDX)
 },
 . FIFO.SZ=USBVndCnst::FIFO_SIZE(USBVndCnst::MyUSB_FIFO_SIZE::SZ_64),//vendor const
 . FIFO.DoubleBuffered=false,
-. CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_BULK)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN),
 . FIFO.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN)
 };
 
@@ -115,12 +115,11 @@ constexpr PHYEndpoint<Stellaris> PHY_EP81={
 . ALIAS=USBVndCnst::Endpoint(EP81_IDX),//USB_EP_N - Stellaris !=EP_IDX 
 . SZ=16,//number 16/64/
 .INTEP=USBVndCnst::INTEP_IN(EP81_IDX),//interrupt
+. CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_INT)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN),
 . ADDR=_EP_IN(EP81_IDX)
 },
 . FIFO.SZ=USBVndCnst::FIFO_SIZE(USBVndCnst::MyUSB_FIFO_SIZE::SZ_16),//vendor const
 . FIFO.DoubleBuffered=false,
- 
-. CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_INT)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN),
 . FIFO.CFG_FLAGS=USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN)
 
 };
