@@ -16,6 +16,8 @@ Output/DebugSmall/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/__SEGGER_RTL_Arm_Conf.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdbool.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdbool.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/serial_print.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/include/stdarg.h \
   ../StellarisWare/inc/hw_types.h ../StellarisWare/driverlib/sysctl.h \
@@ -377,8 +379,6 @@ Output/DebugSmall/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/search.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/find_first_of.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdio \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/stdio.h \
-  /opt/SEGGER/segger_embedded_studio_8.28a/include/stdio.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/iosfwd \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/fstream.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__fwd/ios.h \

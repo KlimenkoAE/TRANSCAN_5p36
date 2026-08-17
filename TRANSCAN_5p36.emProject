@@ -82,6 +82,7 @@
       <file file_name="_TIMERS.hpp" />
       <file file_name="_USB.hpp" />
       <file file_name="BackEnd.hpp" />
+      <file file_name="CMD.hpp" />
       <file file_name="fifo_ring.hpp" />
       <file file_name="MyTuples.hpp" />
       <file file_name="periferalInterruptsHandlers.hpp" />

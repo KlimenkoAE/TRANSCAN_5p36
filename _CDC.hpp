@@ -1,7 +1,7 @@
 #pragma once
 #include "fifo_ring.hpp"
 #include "serial_print.hpp"
-
+#include "CMD.hpp"
 //////////////////////////////////////////////////////
 extern "C"{
 #include <stdio.h>
@@ -19,6 +19,9 @@ extern "C"{
 #include "periferalInterruptsHandlers.hpp"
 #include "wrappers_headers.hpp"
 //#include "USB_THIS_PROGRAM_DEFS.hpp"
+// Передача из кольцевого буфера FIFO
+void TX();
+
 typedef enum
 {
     CDC_SS_NONE        = 0x00, // ничего не активно
@@ -48,7 +51,7 @@ typedef enum
   bool f12:1;
   bool f13:1;
   bool f14:1;
-  bool f15:1;
+  bool ECHO:1;
   };
   uint16_t all;
 };
@@ -68,6 +71,17 @@ struct {uint32_t dwDTERate;   // скорость, little-endian
         uint8_t arr[7];
 };
 
+constexpr    uint8_t MAX_CMD_LEN=15;
+constexpr    uint8_t MAX_CMD_ARGS=2;
+constexpr    uint8_t MAX_CMD_CNT=10;
+constexpr    uint8_t CMD_SEPARATOR='#';
+using CMDProc=
+CommandSeparator<
+     MAX_CMD_LEN,
+     MAX_CMD_ARGS,
+     MAX_CMD_CNT,
+     CMD_SEPARATOR
+    > ;
 
 template
 <
@@ -86,14 +100,16 @@ class CDC{
   CDC_Flags Flags;
   _ImmediaetyTransferState ImmediaetyTransferState;
   uint16_t ControlState;
+  bool DbgEcho=false;
   bool& TIMER_TX_INT_FLAG;
   bool& TIMER_COMMUNICATION_INT_FLAG;
 public:
     CDC(bool& timer_tx_f,bool& timer_comm_f)
         : Print([this](uint8_t b){ fr_TX.add_byte(b); })
         ,TIMER_TX_INT_FLAG(timer_tx_f)
-        ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)
-    {//это значения USB_INTEP_INT возвращаются в сеелларис через статус прерывания
+        ,TIMER_COMMUNICATION_INT_FLAG(timer_comm_f)      
+  {  Flags.all=0;  
+   //это значения USB_INTEP_INT возвращаются в сеелларис через статус прерывания
    USB_COM_Handlers<INIT.PHY_EP_DATA_IN.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_IN.IDX)),[this](){
   TX_InterrupHandler();
   });
@@ -103,6 +119,20 @@ public:
    USB_COM_Handlers<INIT.PHY_EP_COMMUNICATION.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_COMMUNICATION.IDX)) ,[this](){
   Communication_InterrupHandler();
   });
+
+///////////////////CMD Register
+
+
+
+
+CMDProc::CmdHandlerRegister<7>(
+        "echoon",
+        [this](const uint8_t*,uint8_t l){Flags.ECHO=true;}
+        );
+CMDProc::CmdHandlerRegister<8>(
+        "echooff",
+        [this](const uint8_t*,uint8_t){Flags.ECHO=false;});
+/////////////////////////////////
     // принимаем host status line
     ExtSetupHandlerRegister
     (
@@ -286,7 +316,7 @@ void TX_Immediacy( uint8_t* buf, uint32_t sz) {
 }
 // Передача из кольцевого буфера FIFO
 void TX() {
-if(fr_TX->Count()==0)return;
+if(fr_TX.Count()==0)return;
 uint16_t cnt_for_tx=0;
 // Если endpoint занят — выходим, чтобы не потерять приоритетные данные
 
@@ -298,17 +328,17 @@ uint16_t cnt_for_tx=0;
         return;
     }
     // Пока есть полный пакет
-    while(fr_TX->Count() >= INIT.PHY_EP_DATA_IN.SZ) {
+    while(fr_TX.Count() >= INIT.PHY_EP_DATA_IN.SZ) {
         uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
 
-        cnt_for_tx =fr_TX->read_range(pkt, INIT.PHY_EP_DATA_IN.SZ);   // вытащить из кольца
+        cnt_for_tx =fr_TX.read_range(pkt, INIT.PHY_EP_DATA_IN.SZ);   // вытащить из кольца
         TX_Immediacy(pkt, cnt_for_tx);
     }
 
     // Остаток < CDC0_TX_SZ
-    if(fr_TX->Count() > 0) {
+    if(fr_TX.Count() > 0) {
         uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
-        cnt_for_tx = fr_TX->read_range (pkt, fr_TX->Count());
+        cnt_for_tx = fr_TX.read_range (pkt, fr_TX.Count());
         TX_Immediacy(pkt, cnt_for_tx);
     }
     else if(cnt_for_tx%INIT.PHY_EP_DATA_IN.SZ==0){
@@ -347,16 +377,30 @@ void TX_InterrupHandler(){
 }
 
 void RX_InterrupHandler(){
+
+// printf("RXhandler\n");
    USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_OUT);
        unsigned long len = USBWRP::EndpointDataAvail(INIT.PHY_EP_DATA_OUT);
-        if (len > 0)
-        {
+        if (len == 0)return;
+        
     
             uint8_t rx_buf[INIT.PHY_EP_DATA_OUT.SZ];        
             USBWRP::EndpointDataGet(INIT.PHY_EP_DATA_OUT, rx_buf, &len);
-            // Здесь извлекаю из фифо в fr_CDC_RX
-            fr_RX.write_range(rx_buf,len);                 
-        }
+CMDProc::CMD_Filter(
+         fr_RX,
+         rx_buf,
+         len);
+
+//Flags.ECHO=true;
+        if(Flags.ECHO){       
+         uint8_t echo_buf[64];
+            uint16_t echo_len = fr_RX.read_range(echo_buf,64);
+        fr_TX.write_range(echo_buf,echo_len);
+        TX(); 
+        }  
+  
+//echo
+///MAP_IntMasterEnable();
     // Обязательно разрешаем следующий приём
      USBWRP::DevEndpointDataAck(INIT.PHY_EP_DATA_OUT, false);
      Flags.DATA_OUT_INT=true;

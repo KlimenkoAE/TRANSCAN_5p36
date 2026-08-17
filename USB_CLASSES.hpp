@@ -347,6 +347,17 @@ struct {uint32_t dwDTERate;   // скорость, little-endian
   };
 inline _Buffer buffer={.arr={0,0,0,0,0,0,0,0}};
 
+constexpr bool streq(const uint8_t* a, const char* b)
+{
+    while (*a && *b)
+    {
+        if (*a++ != static_cast<uint8_t>(*b++))
+            return false;
+    }
+
+    return *a == 0 && *b == 0;
+}
+
 
 
 
