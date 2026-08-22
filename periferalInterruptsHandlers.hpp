@@ -29,15 +29,18 @@ public:
 inline static  std::function<void()> handlers[30];
 
 static  void Execute(uint32_t int_COM_status){
-
+//printf("CS32 %x \n",int_COM_status);
   while (int_COM_status) {
    auto& h = handlers[USBWRP::COMInterruptIndex(int_COM_status)]; 
-    if (h) h();
+    if (h) {h();}
     int_COM_status &= int_COM_status - 1;//убирает последни установленны бит
+   // printf("CS37 %x \n",int_COM_status);
   }
 }
  static  void Register(uint32_t int_COM_status,std::function<void()> handler){
   handlers[USBWRP::COMInterruptIndex(int_COM_status)]=handler;
+   //printf("COMInterruptIndexRegistry %x   %x \n",int_COM_status,USBWRP::COMInterruptIndex(int_COM_status));
+
   }
 };
 

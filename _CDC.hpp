@@ -2,6 +2,7 @@
 #include "fifo_ring.hpp"
 #include "serial_print.hpp"
 #include "CMD.hpp"
+
 //////////////////////////////////////////////////////
 extern "C"{
 #include <stdio.h>
@@ -93,8 +94,9 @@ class CDC{
   FIFO_Ring<INIT.tx_fr_size> fr_RX; 
   FIFO_Ring<INIT.rx_fr_size> fr_TX;
   CDC_LineCoding_t LineCoding;
+  public:
   Serial_Print Print;
-
+private:
   CDC_SerialState_t Host_Curr_State;
   CDC_SerialState_t Dev_Curr_State;
   CDC_Flags Flags;
@@ -113,9 +115,10 @@ public:
    USB_COM_Handlers<INIT.PHY_EP_DATA_IN.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_IN.IDX)),[this](){
   TX_InterrupHandler();
   });
-   USB_COM_Handlers<INIT.PHY_EP_DATA_IN.USB_BASE>::Register(USBVndCnst::INTEP_OUT(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_OUT.IDX)) ,[this](){
+   USB_COM_Handlers<INIT.PHY_EP_DATA_OUT.USB_BASE>::Register(USBVndCnst::INTEP_OUT(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_DATA_OUT.IDX)) ,[this](){
   RX_InterrupHandler();
   });
+  
    USB_COM_Handlers<INIT.PHY_EP_COMMUNICATION.USB_BASE>::Register(USBVndCnst::INTEP_IN(static_cast<USBVndCnst::MyUSB_EP>(INIT.PHY_EP_COMMUNICATION.IDX)) ,[this](){
   Communication_InterrupHandler();
   });
@@ -188,10 +191,13 @@ CMDProc::CmdHandlerRegister<8>(
               //  set_usb_cfg();
                // }	                                             
                Flags.DATA_IN_ON=false;
+                   printf("clear Flags.DATA_IN_ON %d \r\n",Flags.DATA_IN_ON);
                sup_data=_device_state::Configurated;
                Host_Curr_State = CDC_SS_NONE;
                Dev_Curr_State = CDC_SS_DCD; // только присутствие
                EP_INT_ON_OFF(true);
+               Flags.DATA_IN_ON=true;
+               printf("set Flags.DATA_IN_ON %d \r\n",Flags.DATA_IN_ON);
                             },
                             SET_CONFIGURATION,
                             0
@@ -316,6 +322,7 @@ void TX_Immediacy( uint8_t* buf, uint32_t sz) {
 }
 // Передача из кольцевого буфера FIFO
 void TX() {
+//printf("TX0\n");
 if(fr_TX.Count()==0)return;
 uint16_t cnt_for_tx=0;
 // Если endpoint занят — выходим, чтобы не потерять приоритетные данные
@@ -323,16 +330,30 @@ uint16_t cnt_for_tx=0;
     if(Host_Curr_State!=CDC_SS_DCD_DSR){
       Dev_Change_Status(CDC_SS_DCD_DSR);//это отправит 0x03 и по идее изменится CDC_Host_Curr_State
      // SysCtlDelay(DELAY_LOAD_1us*100);
+    // printf("TX1\n");
     }
-    if (Flags.DATA_IN_BUSY||!Flags.DATA_IN_ON) {
+//if(Flags.DATA_IN_BUSY==true||Flags.DATA_IN_ON==false)printf("Flags.DATA_IN_BUSY= %d   Flags.DATA_IN_ON= %d\r\n",Flags.DATA_IN_BUSY,Flags.DATA_IN_ON);
+    if (Flags.DATA_IN_BUSY/*||!Flags.DATA_IN_ON*/) {
+    //printf("TX2\n");
         return;
     }
+    // printf("TX3\n");
     // Пока есть полный пакет
     while(fr_TX.Count() >= INIT.PHY_EP_DATA_IN.SZ) {
         uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
 
         cnt_for_tx =fr_TX.read_range(pkt, INIT.PHY_EP_DATA_IN.SZ);   // вытащить из кольца
         TX_Immediacy(pkt, cnt_for_tx);
+
+ //for (const auto& byte : pkt) {
+        // :02x formats the element as a 2-digit zero-padded lowercase hex block
+  //      std::printf("%c ", byte); 
+  //  }
+  //  std::printf("  1\n");
+
+
+
+    //    printf("p0   %s\r\n", (int)cnt_for_tx, reinterpret_cast<const char*>(pkt));
     }
 
     // Остаток < CDC0_TX_SZ
@@ -340,6 +361,11 @@ uint16_t cnt_for_tx=0;
         uint8_t pkt[INIT.PHY_EP_DATA_IN.SZ];
         cnt_for_tx = fr_TX.read_range (pkt, fr_TX.Count());
         TX_Immediacy(pkt, cnt_for_tx);
+       //  for (const auto& byte : pkt) {
+        // :02x formats the element as a 2-digit zero-padded lowercase hex block
+       // std::printf("%c ", byte); 
+    //}
+   // std::printf("  2\n");
     }
     else if(cnt_for_tx%INIT.PHY_EP_DATA_IN.SZ==0){
      USBWRP::EndpointDataPut(INIT.PHY_EP_DATA_IN, NULL, 0);
@@ -350,7 +376,9 @@ uint16_t cnt_for_tx=0;
 // Вспомогательная inline-функция: отправка следующего куска приоритетного буфера
  void SendPriorityChunk(void){
     if(Flags.PRIORITY_PENDING) {
+//printf("SP0 \r\n");
         if(ImmediaetyTransferState.pr_pos < ImmediaetyTransferState.pr_len) {
+      //  printf("SP1 \r\n");
             uint32_t remaining = ImmediaetyTransferState.pr_len - ImmediaetyTransferState.pr_pos;
             uint32_t chunk = (remaining > INIT.PHY_EP_DATA_IN.SZ) ? INIT.PHY_EP_DATA_IN.SZ : remaining;
 
@@ -362,7 +390,9 @@ uint16_t cnt_for_tx=0;
             ImmediaetyTransferState.pr_pos += chunk;
         } else {
             // весь буфер ушёл
+        //    printf("SP2 \r\n");
             Flags.PRIORITY_PENDING = false;
+            Flags.DATA_IN_BUSY = false;
         }
     }
 }
@@ -372,13 +402,13 @@ void TX_InterrupHandler(){
 
     Flags.DATA_IN_INT = true;   // бросаем флаг "было прерывание"
     Flags.DATA_IN_BUSY = false; // освобождаем endpoint
-
-    SendPriorityChunk();        // проверяем и отправляем срочный кусок
+//printf("TXhandler\n");
+//    SendPriorityChunk();        // проверяем и отправляем срочный кусок
 }
 
 void RX_InterrupHandler(){
 
-// printf("RXhandler\n");
+ //printf("RXhandler\n");
    USBWRP::EP_StatusClear(INIT.PHY_EP_DATA_OUT);
        unsigned long len = USBWRP::EndpointDataAvail(INIT.PHY_EP_DATA_OUT);
         if (len == 0)return;
@@ -390,7 +420,7 @@ CMDProc::CMD_Filter(
          fr_RX,
          rx_buf,
          len);
-
+ printf("Flags.ECHO= %d\n",Flags.ECHO);
 //Flags.ECHO=true;
         if(Flags.ECHO){       
          uint8_t echo_buf[64];
@@ -445,6 +475,7 @@ DevStatusAnswer(true);
     break;
     case CDC_SS_DCD_DSR:
     Flags.DATA_IN_ON=true;
+   // printf("set Flags.DATA_IN_ON %d \r\n",Flags.DATA_IN_ON);
     break;
     case CDC_SS_OVERRUN:
     break;
@@ -476,7 +507,10 @@ static const uint32_t delay_load = DELAY_LOAD_1us*150;
 }
 void Process_TX_Timer()
 {
+//printf("TX() \r\n");
+    SendPriorityChunk();  
 if(!TIMER_TX_INT_FLAG)return;
+//printf("TXhandler \r\n");
 TX();
 TIMER_TX_INT_FLAG=false;
 }

@@ -131,8 +131,8 @@ constexpr uint8_t SELF_POWRED =1;
 constexpr uint8_t STATUS_DEVICE[2]= {(REMOTE_WAKEUP<<1)|(SELF_POWRED),0 };
 
 constexpr  CDC_INIT_t CDC_INIT={
-.tx_fr_size= 0x800,
-.rx_fr_size = 0x800,
+.tx_fr_size= 0x1000,
+.rx_fr_size = 0x1000,
 
 .PHY_EP_DATA_IN=PHY_EP82,
 .PHY_EP_DATA_OUT=PHY_EP02,

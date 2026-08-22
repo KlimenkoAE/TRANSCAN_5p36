@@ -46,6 +46,7 @@ uint32_t period_us,uint32_t... ext_periodes>
 
 class TimerPeriodic_us{
 TimerISR TISR;
+uint32_t counter;
 class InerStruct{
   public:
   uint32_t period;
@@ -70,25 +71,26 @@ uint32_t max_ext_period = (std::max)({ext_periodes...});
 InerStruct ExtPeriodes[sizeof...(ext_periodes)]={InerStruct{period_us,ext_periodes}...};
 
 
-bool TIMER_IS_INIT;
-bool TIMER_IS_ENABLE;
+ bool TIMER_IS_INIT=false;
+ bool TIMER_IS_ENABLE=false;
 
 void ISR(){
-static uint32_t counter=0;
+//printf("(T_ISR\n");
+
   uint32_t ts=TimerIntStatus(timer_base,true);
 
   if( ts&timer_timeout){
         TimerIntClear(timer_base, timer_timeout);
         main_period.int_flag=true;
- 
+        
 
         for(int i=0;i<ext_periodes_cnt;++i){
           if(counter%ExtPeriodes[i].presc==0){
           ExtPeriodes[i].int_flag=true;
-          if(ExtPeriodes[i].period==max_ext_period)counter=0;
-            else ++counter;
+          if(ExtPeriodes[i].period==max_ext_period)counter=0;           
           }
         }
+++counter;
   }
 };
 public:
@@ -107,9 +109,11 @@ TIMER_IS_INIT=false;
   //  TimerIntRegister(timer_base,timer_letter,Timer_ISR_Wrapper);
     TimerIntClear(timer_base, timer_timeout);
     TimerIntEnable(timer_base, timer_timeout);
+    counter=0;
 TIMER_IS_INIT=true;
 };
 void Enable(){
+printf("TIMER_IS_ENABLE = %d, TIMER_IS_INIT =%d\n",TIMER_IS_ENABLE,TIMER_IS_INIT);
 if(TIMER_IS_ENABLE==false&&TIMER_IS_INIT){
     TimerEnable(timer_base,timer_letter);
     TimerIntEnable(timer_base,timer_timeout);
@@ -123,6 +127,7 @@ void Disable(){
     TIMER_IS_ENABLE=false;
     }
   }
+uint32_t GetCurrentCnt(){return counter;}
 bool& IntFlag(uint8_t i){return ExtPeriodes[i].IntFlag();} 
 };
 

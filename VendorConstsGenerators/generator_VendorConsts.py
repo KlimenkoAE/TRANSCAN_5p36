@@ -19,6 +19,12 @@ generators = {
         "gen_usb_defs.py",
         "gen_usb_regs.py",
         "gen_hw_ints.py",
+        "gen_timer_dfs.py",
+        "gen_hw_memmap.py",
+        "gen_sysctl.py",
+	"gen_can_defs.py",
+        "gen_can_struct.py",
+
     ],
 
     "stm32": [
@@ -63,8 +69,8 @@ with open(output, "w", encoding="utf-8") as f:
 
     f.write("#pragma once\n")
     f.write("#include <cstdint>\n\n")
-    f.write("#include \"usb.h\"\n\n")
-    f.write("#include \"hw_ints.h\"\n\n")
+
+
 
 # ------------------------------------------------------------
 # Run generators

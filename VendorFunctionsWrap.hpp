@@ -417,5 +417,49 @@ uint32_t dbg=
     MAP_USBDevEndpointStatusClear(ep.USB_BASE, ep.ALIAS, st);
 }
   };//USB
+  class CAN{
+   void vwCAN_Init();
+
+//прерывания
+ void vwCAN_IntEnable()
+ {
+ };
+ void vwCANIntDesable()
+ {
+ };
+//настройка частоты по умолчанию
+ void vwCAN_SetFrequency(unsigned long CANf)
+ {
+ };
+//сброс
+ void vwCAN_Reset();
+ bool vwCAN_MerssageConfigureDefaultRX
+ (uint8_t msg_obj_num,
+ tCANMsgObject* Msg)
+ {
+ };
+
+ bool vwCANMessageConfigureTX
+ (uint32_t ID,
+  uint32_t msg_obj_num,
+  uint32_t flags,
+  tCANMsgObject* Msg,
+  uint8_t buf_len)
+  {
+
+ };
+ bool vwCAN_MessageConfigureRX
+ (uint8_t msg_obj_num, 
+ uint32_t ID,
+ uint32_t msk,
+ uint32_t flags,
+ tCANMsgObject* Msg,
+ uint8_t buf_len)
+ {
+ 
+ };
+
+ void CAN_SetSpeed(uint32_t bitrate);
+  }//CAN
 };//WRAP
 

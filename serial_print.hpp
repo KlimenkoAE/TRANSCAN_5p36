@@ -1,7 +1,7 @@
 #pragma once
 #include "fifo_ring.hpp"
 #include<stdarg.h>
-
+//#include<stdio.h>
  extern "C"{
 #include "hw_types.h"
 #include "sysctl.h"
@@ -56,8 +56,12 @@ st_PrintByte(this,reg);
       };
 
 void printf(const char* strf, ... ){
-va_list args;
-st_printf(this,strf, args);
+    va_list args;
+    va_start(args, strf);              // инициализация списка
+    st_printf(this, strf, args);       // передаём весь «ракет» в st_printf
+    va_end(args);
+//va_list args;
+//st_printf(this,strf, args);
   }
 
 
@@ -134,7 +138,9 @@ static    void st_PrintByteArary(Serial_Print* self,uint32_t len, uint8_t* arr){
       };
 
 
-static  void st_printf(Serial_Print* self,const char* strf,...){
+
+      //std::printf("strf",previousTMCnt);
+/*static  void st_printf(Serial_Print* self,const char* strf,va_list args){
 
   const char* p=strf;
   uint8_t va_cnt=0;
@@ -143,7 +149,8 @@ static  void st_printf(Serial_Print* self,const char* strf,...){
   }
   while(*++p!='\0');
 
-  va_list args;
+ // va_list args;
+
   va_start(args,va_cnt);
 
   p=strf;
@@ -168,6 +175,28 @@ static  void st_printf(Serial_Print* self,const char* strf,...){
       }
   }
   va_end(args);
-  }
+  }*/
+static void st_printf(Serial_Print* self, const char* strf, va_list args) {
+    const char* p = strf;
+    while (*p != '\0') {
+        if (*p == '%') {
+            switch (*++p) {
+            case 'x':
+            case 'X':
+                st_Print32_t_0x(self, va_arg(args, uint32_t));
+                break;
+            case 'd':
+                st_Print32_t(self, va_arg(args, uint32_t));
+                break;
+            case 's':
+                st_Print(self, va_arg(args, unsigned char*));
+                break;
+            }
+            ++p;
+        } else {
+            self->add_byte(*p++);
+        }
+    }
+}
 };
 

@@ -106,16 +106,16 @@ SysCtlPeripheralClockGating(true);
 MAP_SysCtlPeripheralEnable(CONTROL_EP.INIT_DATA.SysCtlPeriferal );
   //common timer us
   /////////////////
-/*  TimerPeriodic_us<
+  TimerPeriodic_us<
   TIMER0_BASE
   ,TIMER_CFG_32_BIT_PER
   , SYSCTL_PERIPH_TIMER0
   ,TIMER_A
   ,TIMER_TIMA_TIMEOUT
-  ,1
-  ,10,100,1000,10000,100000,1000000> T_us;
+  ,2
+  ,4,6,10000,100000,1000000,10000000> T_us;
 
-T_us.Disable();*/
+T_us.Disable();
 
 
 bool T1=false;
@@ -127,7 +127,7 @@ bool T2=false;
   <
   CONTROL_EP,
   CDC_INIT   
-  > CDC0(T1,T2);//(T_us.IntFlag(0),T_us.IntFlag(5));//
+  > CDC0(T_us.IntFlag(0),T_us.IntFlag(5));//CDC0(T1,T2);
 
  
  
@@ -141,15 +141,23 @@ bool T2=false;
   
   MAP_IntMasterEnable();
 
-//T_us.Enable();
+T_us.Enable();
 
 
 
-
+static uint32_t previousTMCnt=0;
   while(1) {
+CDC0.Process_TX_Timer();
 
+if(T_us.IntFlag(1)){
 
-
+//uint32_t currCnt=T_us.GetCurrentCnt();
+//uint32_t period=(previousTMCnt<currCnt)?currCnt-previousTMCnt:0xFFFFFFFF;
+//previousTMCnt=T_us.GetCurrentCnt();
+//printf("(T_us.IntFlag(1) interval %d\r\n",previousTMCnt);
+CDC0.Print.printf("(T_us.IntFlag(1) interval %d\r\n",previousTMCnt++);
+T_us.IntFlag(1)=false;
+}
 
   }
 };

@@ -75,7 +75,8 @@ for name, value in pattern.findall(text):
 
 define_map = dict(defines)
 
-
+#print(defines[0])
+#print(defines[1])
 # ============================================================
 # Helpers
 # ============================================================
@@ -186,7 +187,7 @@ def write_enum_group(
     for name, value in definitions:
 
         f.write(
-            f"    {name},\n"
+            f"    {value},//{name}\n"
         )
 
 
@@ -250,7 +251,7 @@ ep_definitions.sort(
 # USB_INTEP_0
 # USB_INTEP_DEV_IN_1 ... 15
 # ============================================================
-
+"""
 ep_in = []
 
 if "USB_INTEP_0" in define_map:
@@ -266,16 +267,17 @@ if "USB_INTEP_0" in define_map:
 for name, value in defines:
 
     match = re.fullmatch(
-        r"USB_INTEP_DEV_IN_(\d+)",
+        r"USB_(INTEP_DEV_IN_\d+)\s+(0x[0-9A-Fa-f]+|[0-9]+)",
         name
     )
 
     if match:
 
         ep_in.append(
-            (
-                int(match.group(1)),
-                name
+                int(match.group(1),
+                name,
+                int(match.group(2),
+                value
             )
         )
 
@@ -283,7 +285,31 @@ for name, value in defines:
 ep_in.sort(
     key=lambda item: item[0]
 )
+"""
+########################################
+import re
 
+ep_in = []
+
+if "USB_INTEP_0" in define_map:
+    ep_in.append((0, "USB_INTEP_0", 0x00000000))
+
+for name, value in defines:
+    match = re.fullmatch(
+        r"USB_(INTEP_DEV_IN_)(\d+)\s+(0x[0-9A-Fa-f]+|[0-9]+)",
+        f"{name} {value}"
+    )
+    if match:
+        ep_in.append(
+            (
+                int(match.group(2)),                  # номер EP
+                f"{match.group(1)}{match.group(2)}",  # имя целиком
+                int(match.group(3), 0)                # значение (hex/dec)
+            )
+        )
+
+# сортировка по номеру EP
+ep_in.sort(key=lambda item: item[0])
 
 # ============================================================
 # Device OUT endpoint interrupt masks
@@ -292,38 +318,31 @@ ep_in.sort(
 # USB_INTEP_DEV_OUT_1 ... 15
 # ============================================================
 
+import re
+
 ep_out = []
 
 if "USB_INTEP_0" in define_map:
-
-    ep_out.append(
-        (
-            0,
-            "USB_INTEP_0"
-        )
-    )
-
+    ep_out.append((0, "USB_INTEP_0", 0x00000000))
 
 for name, value in defines:
-
     match = re.fullmatch(
-        r"USB_INTEP_DEV_OUT_(\d+)",
-        name
+        r"USB_(INTEP_DEV_OUT_)(\d+)\s+(0x[0-9A-Fa-f]+|[0-9]+)",
+        f"{name} {value}"
     )
-
     if match:
-
         ep_out.append(
             (
-                int(match.group(1)),
-                name
+                int(match.group(2)),                  # номер EP
+                f"{match.group(1)}{match.group(2)}",  # имя целиком
+                int(match.group(3), 0)                # значение (hex/dec)
             )
         )
 
+# сортировка по номеру EP
+ep_out.sort(key=lambda item: item[0])
 
-ep_out.sort(
-    key=lambda item: item[0]
-)
+
 
 
 # ============================================================
@@ -483,7 +502,7 @@ with open(
         for number, name, value in ep_definitions:
 
             f.write(
-                f"        {name},\n"
+                f"        {value},//{name}\n"
             )
 
 
@@ -518,10 +537,10 @@ with open(
         f.write("    {\n")
 
 
-        for number, name in ep_in:
+        for num, name, value in ep_in:
 
             f.write(
-                f"        {name},\n"
+                f"        0x{value:08X},//{name}\n"
             )
 
 
@@ -556,10 +575,10 @@ with open(
         f.write("    {\n")
 
 
-        for number, name in ep_out:
+        for num , name, value in ep_out:
 
             f.write(
-                f"        {name},\n"
+                f"         0x{value:08X},//{name}\n"
             )
 
 
@@ -684,7 +703,7 @@ with open(
         for name, value in speed:
 
             f.write(
-                f"        {name},\n"
+                f"        {value},//{name}\n"
             )
 
 

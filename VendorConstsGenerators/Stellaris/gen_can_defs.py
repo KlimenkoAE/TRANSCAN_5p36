@@ -19,13 +19,17 @@ if len(sys.argv) != 2:
 
 stellarisware = Path(sys.argv[1]).resolve()
 
-src = stellarisware / "inc" / "hw_ints.h"
+src = stellarisware / "driverlib" / "can.h"
 
 dst = (
     Path(__file__).resolve().parent.parent.parent
     / "StellarisDefinition.hpp"
 )
-
+def fix_enum_name(name: str) -> str:
+    # если имя начинается с цифры — добавляем префикс T
+    if name[0].isdigit():
+        return "C" + name
+    return name
 
 # ============================================================
 # Read source
@@ -68,7 +72,7 @@ if match:
 # ============================================================
 # Read numeric #define
 #
-# Order is preserved exactly as in hw_ints.h.
+# Order is preserved exactly as in timer.h
 # ============================================================
 
 defines = []
@@ -86,56 +90,39 @@ for name, value in pattern.findall(text):
     defines.append((name, value))
 
 
+
+
 # ============================================================
 # Groups
 # ============================================================
 
-faults = [
+msg = [
     (name, value)
     for name, value in defines
-    if name.startswith("FAULT_")
+    if name.startswith("MSG_")
 ]
 
 
-interrupts = [
+can = [
     (name, value)
     for name, value in defines
-    if name.startswith("INT_")
+    if name.startswith("CAN_")
 ]
-
-
-special_names = {
-    "NUM_INTERRUPTS",
-    "NUM_PRIORITY",
-    "NUM_PRIORITY_BITS",
-}
-
-
-special = [
-    (name, value)
-    for name, value in defines
-    if name in special_names
-]
-
 
 # ============================================================
 # Diagnostics
 # ============================================================
 
 print(
-    f"FAULT definitions : {len(faults)}",
+    f"CAN_MSG definitions : {len(msg)}",
     file=sys.stderr
 )
 
 print(
-    f"INT definitions   : {len(interrupts)}",
+    f"CAN definitions   : {len(can)}",
     file=sys.stderr
 )
 
-print(
-    f"Special constants : {len(special)}",
-    file=sys.stderr
-)
 
 
 # ============================================================
@@ -153,7 +140,7 @@ with open(
         "// ============================================================\n"
     )
     f.write(
-        "// Interrupt definitions generated from hw_ints.h\n"
+        "// CAN definitions generated from can.h\n"
     )
     f.write(
         "// ============================================================\n\n"
@@ -161,24 +148,24 @@ with open(
 
 
     # ========================================================
-    # Faults
+    # Timer
     # ========================================================
 
-    if faults:
+    if msg:
 
         f.write(
-            "enum class MyFAULT : uint8_t\n"
+            "enum class MyCAN_MSG : uint8_t\n"
         )
 
         f.write("{\n")
 
-        for name, value in faults:
+        for name, value in msg:
 
-            member = name[len("FAULT_"):]
-            if member == "DEBUG":
-                member = "DBG"
+            member = name[len("MSG_"):]
+        #    if member == "DEBUG":
+        #        member = "DBG"
             f.write(
-                f"    {member},\n"
+                f"    {fix_enum_name(member)},\n"
             )
 
         f.write("};\n\n")
@@ -186,7 +173,7 @@ with open(
 
         f.write(
             "static constexpr uint32_t "
-            "FAULT(MyFAULT flag)\n"
+            "CAN_MSG(MyCAN_MSG flag)\n"
         )
 
         f.write("{\n")
@@ -197,10 +184,10 @@ with open(
 
         f.write("    {\n")
 
-        for name, value in faults:
+        for name, value in msg:
 
             f.write(
-                f"        {value},//{name},\n"
+                f"        {value},\n"
             )
 
         f.write("    };\n")
@@ -224,20 +211,20 @@ with open(
     # StellarisDefinitionView.hpp.
     # ========================================================
 
-    if interrupts:
+    if can:
 
         f.write(
-            "enum class MyINT : uint8_t\n"
+            "enum class MyCAN : uint8_t\n"
         )
 
         f.write("{\n")
 
-        for name, value in interrupts:
+        for name, value in can:
 
-            member = name[len("INT_"):]
+            member = name[len("CAN_"):]
 
             f.write(
-                f"    {member},\n"
+                f"    {fix_enum_name(member)},\n"
             )
 
         f.write("};\n\n")
@@ -245,7 +232,7 @@ with open(
 
         f.write(
             "static constexpr uint32_t "
-            "INT(MyINT flag)\n"
+            "CAN(MyCAN flag)\n"
         )
 
         f.write("{\n")
@@ -256,10 +243,10 @@ with open(
 
         f.write("    {\n")
 
-        for name, value in interrupts:
+        for name, value in can:
 
             f.write(
-                f"        {value},//{name},\n"
+                f"        {value},\n"
             )
 
         f.write("    };\n")
@@ -271,29 +258,4 @@ with open(
         )
 
         f.write("}\n\n")
-
-
-    # ========================================================
-    # Special constants
-    # ========================================================
-
-    special_names_map = {
-      "NUM_INTERRUPTS": "NumInterrupts",
-      "NUM_PRIORITY": "NumPriority",
-      "NUM_PRIORITY_BITS": "NumPriorityBits",
-    }
-
-
-
-    for name, value in special:
-      cpp_name = special_names_map[name]
-      f.write(
-          f"static constexpr uint32_t "
-          f"{cpp_name} = {value};\n"
-      )
-          
-
-    if special:
-        f.write("\n")
-
 
