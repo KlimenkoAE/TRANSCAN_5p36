@@ -106,7 +106,7 @@ SysCtlPeripheralClockGating(true);
 MAP_SysCtlPeripheralEnable(CONTROL_EP.INIT_DATA.SysCtlPeriferal );
   //common timer us
   /////////////////
-  TimerPeriodic_us<
+/*  TimerPeriodic_us<
   TIMER0_BASE
   ,TIMER_CFG_32_BIT_PER
   , SYSCTL_PERIPH_TIMER0
@@ -145,11 +145,11 @@ T_us.Enable();
 
 
 
-static uint32_t previousTMCnt=0;
+static uint32_t previousTMCnt=0;*/
   while(1) {
-CDC0.Process_TX_Timer();
+//CDC0.Process_TX_Timer(); 
 
-if(T_us.IntFlag(1)){
+/*if(T_us.IntFlag(1)){
 
 //uint32_t currCnt=T_us.GetCurrentCnt();
 //uint32_t period=(previousTMCnt<currCnt)?currCnt-previousTMCnt:0xFFFFFFFF;
@@ -157,7 +157,9 @@ if(T_us.IntFlag(1)){
 //printf("(T_us.IntFlag(1) interval %d\r\n",previousTMCnt);
 CDC0.Print.printf("(T_us.IntFlag(1) interval %d\r\n",previousTMCnt++);
 T_us.IntFlag(1)=false;
-}
+}*/
+
+//CANWRP::Send(CM1);
 
   }
 };

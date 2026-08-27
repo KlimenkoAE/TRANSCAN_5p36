@@ -650,10 +650,14 @@ Output/Release/Obj/TRANSCAN_5p36/_UCB.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/wrappers_headers.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/lm3s5p36.h \
   ../StellarisWare/driverlib/timer.h ../StellarisWare/inc/hw_uart.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_CLASSES.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/concepts \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__concepts/common_with.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_THIS_PROGRAM_DEFS.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \

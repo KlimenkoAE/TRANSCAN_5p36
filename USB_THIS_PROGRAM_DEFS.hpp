@@ -18,7 +18,7 @@ extern "C"{
 
 
 
-using USBWRP=MyUSB<FunctionWraper<PROC>::USB,PROC>;
+
 
 
 //USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::MODE_INT)|USBVndCnst::EP_CFG(USBVndCnst::MyUSB_EP_CFG::DEV_IN));

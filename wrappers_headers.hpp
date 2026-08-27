@@ -24,6 +24,7 @@ class VendorConsts;
 template <class T>
 class FunctionWraper{
 class USB;
+class CAN;
 };
 
 class Stellaris{
@@ -86,8 +87,11 @@ using  PROC=Stellaris;
 
 using USBVndCnst = VendorConsts<PROC>;
 
-#include "USB_CLASSES.hpp"
 
+
+#include "MemPull.hpp"
+#include "USB_CLASSES.hpp"
+#include "CAN_CLASSES.hpp"
 #include "VENDOR_CONSTANT_WRAP.hpp"
 
 #include "VendorFunctionsWrap.hpp"
@@ -97,3 +101,6 @@ using USBVndCnst = VendorConsts<PROC>;
 #include "BackEnd.hpp"
 
 #include "USB_THIS_PROGRAM_DEFS.hpp"
+#include "CAN_THIS_PROGRAM_DEFS.hpp"
+
+

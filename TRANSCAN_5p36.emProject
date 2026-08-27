@@ -82,8 +82,11 @@
       <file file_name="_TIMERS.hpp" />
       <file file_name="_USB.hpp" />
       <file file_name="BackEnd.hpp" />
+      <file file_name="CAN_CLASSES.hpp" />
+      <file file_name="CAN_THIS_PROGRAM_DEFS.hpp" />
       <file file_name="CMD.hpp" />
       <file file_name="fifo_ring.hpp" />
+      <file file_name="MemPull.hpp" />
       <file file_name="MyTuples.hpp" />
       <file file_name="periferalInterruptsHandlers.hpp" />
       <file file_name="periferalISR.hpp" />
@@ -115,6 +118,9 @@
       <file file_name="../StellarisWare/driverlib/gcc-cm3/libdriver-cm3.a" />
       <file file_name="System/SEGGER_THUMB_Startup.s" />
     </folder>
+    <file file_name=".clangd" />
+    <file file_name="VendorConstsGenerators/Stellaris/gen_can_enum.py" />
+    <file file_name="VendorConstsGenerators/Stellaris/gen_can_struct.py" />
     <file file_name="VendorConstsGenerators/Stellaris/gen_hw_ints.py" />
     <file file_name="VendorConstsGenerators/Stellaris/gen_hw_memmap.py" />
     <file file_name="VendorConstsGenerators/Stellaris/gen_sysctl.py" />

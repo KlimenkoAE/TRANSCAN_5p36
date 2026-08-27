@@ -417,8 +417,48 @@ uint32_t dbg=
     MAP_USBDevEndpointStatusClear(ep.USB_BASE, ep.ALIAS, st);
 }
   };//USB
-  class CAN{
-   void vwCAN_Init();
+ class CAN{
+
+ public:
+  // ------------------------------------------------------------------------
+    // Runtime transmission
+    // ------------------------------------------------------------------------
+
+    static void Send(const CAN_Message* msg)
+    {
+
+        // Hardware-specific implementation.
+        //
+        // msg.ID
+        // msg.DLC
+        // msg.Data
+        //
+        // Здесь уже можно сформировать tCANMsgObject
+        // или непосредственно записать регистры Stellaris.
+    }
+
+
+    // ------------------------------------------------------------------------
+    // Compile-time filter configuration
+    // ------------------------------------------------------------------------
+
+    template<CANFilter Filter>
+    static void ConfigureRX()
+    {
+        
+        // Filter::id
+        // Filter::mask
+        //
+        // Здесь Stellaris-specific code:
+        //
+        // CAN message object
+        // CANIntEnable()
+        // CANMessageSet()
+        // hardware ID mask
+        // etc.
+    }
+
+ /*  void vwCAN_Init(){};
 
 //прерывания
  void vwCAN_IntEnable()
@@ -461,5 +501,142 @@ uint32_t dbg=
 
  void CAN_SetSpeed(uint32_t bitrate);
   }//CAN
-};//WRAP
 
+
+extern void CANBitTimingGet(unsigned long ulBase, tCANBitClkParms *pClkParms);
+extern void CANBitTimingSet(unsigned long ulBase, tCANBitClkParms *pClkParms);
+extern unsigned long CANBitRateSet(unsigned long ulBase,
+                                   unsigned long ulSourceClock,
+                                   unsigned long ulBitRate);
+extern void CANDisable(unsigned long ulBase);
+extern void CANEnable(unsigned long ulBase);
+extern tBoolean CANErrCntrGet(unsigned long ulBase, unsigned long *pulRxCount,
+                              unsigned long *pulTxCount);
+extern void CANInit(unsigned long ulBase);
+extern void CANIntClear(unsigned long ulBase, unsigned long ulIntClr);
+extern void CANIntDisable(unsigned long ulBase, unsigned long ulIntFlags);
+extern void CANIntEnable(unsigned long ulBase, unsigned long ulIntFlags);
+extern void CANIntRegister(unsigned long ulBase, void (*pfnHandler)(void));
+extern unsigned long CANIntStatus(unsigned long ulBase,
+                                  tCANIntStsReg eIntStsReg);
+extern void CANIntUnregister(unsigned long ulBase);
+extern void CANMessageClear(unsigned long ulBase, unsigned long ulObjID);
+extern void CANMessageGet(unsigned long ulBase, unsigned long ulObjID,
+                          tCANMsgObject *pMsgObject, tBoolean bClrPendingInt);
+extern void CANMessageSet(unsigned long ulBase, unsigned long ulObjID,
+                          tCANMsgObject *pMsgObject, tMsgObjType eMsgType);
+extern tBoolean CANRetryGet(unsigned long ulBase);
+extern void CANRetrySet(unsigned long ulBase, tBoolean bAutoRetry);
+extern unsigned long CANStatusGet(unsigned long ulBase, tCANStsReg eStatusReg);
+*/
+};
+};//WRAP
+/*
+namespace example1 {
+
+tCANBitClkParms CANBitClk;
+tCANMsgObject sMsgObjectRx;
+unsigned char ucBufferIn[8];
+unsigned char ucBufferOut[8];
+//
+// Reset the state of all the message objects and the state of the CAN
+// module to a known state.
+//
+CANInit(CAN0_BASE);
+//
+// Configure the controller for 1 Mbit operation.
+//
+CANBitRateSet(CAN0_BASE, 8000000, 1000000);
+//
+// Take the CAN0 device out of INIT state.
+
+CANEnable(CAN0_BASE);
+//
+// Configure a receive object this CAN FIFO to receive message objects with
+// message ID 0x400-0x407.
+//
+sMsgObjectRx.ulMsgID = (0x400);
+sMsgObjectRx.ulMsgIDMask = 0x7f8;
+sMsgObjectRx.ulFlags = MSG_OBJ_USE_ID_FILTER | MSG_OBJ_FIFO;
+//
+// The first three message objects have the MSG_OBJ_FIFO set to indicate
+// that they are part of a FIFO.
+//
+CANMessageSet(CAN0_BASE, 1, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+CANMessageSet(CAN0_BASE, 2, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+CANMessageSet(CAN0_BASE, 3, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+//
+// Last message object does not have the MSG_OBJ_FIFO set to indicate that
+// this is the last message.
+//
+sMsgObjectRx.ulFlags = MSG_OBJ_USE_ID_FILTER;
+CANMessageSet(CAN0_BASE, 4, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+
+tCANBitClkParms CANBitClk;
+tCANMsgObject sMsgObjectRx;
+tCANMsgObject sMsgObjectTx;
+unsigned char ucBufferIn[8];
+unsigned char ucBufferOut[8];
+//
+// Reset the state of all the message objects and the state of the CAN
+// module to a known state.
+//
+CANInit(CAN0_BASE);
+CANInit(CAN1_BASE);
+//
+// Configure the controller for 1 Mbit operation.
+//
+CANSetBitTiming(CAN1_BASE, &CANBitClk);
+//
+// Take the CAN0 device out of INIT state.
+//
+CANEnable(CAN0_BASE);
+CANEnable(CAN1_BASE);
+//
+// Configure a receive object.
+//
+sMsgObjectRx.ulMsgID = (0x400);
+
+sMsgObjectRx.ulMsgIDMask = 0x7f8;
+sMsgObjectRx.ulFlags = MSG_OBJ_USE_ID_FILTER | MSG_OBJ_FIFO;
+//
+// The first three message objects have the MSG_OBJ_FIFO set to indicate
+// that they are part of a FIFO.
+//
+CANMessageSet(CAN0_BASE, 1, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+CANMessageSet(CAN0_BASE, 2, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+CANMessageSet(CAN0_BASE, 3, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+//
+// Last message object does not have the MSG_OBJ_FIFO set to indicate that
+// this is the last message.
+//
+sMsgObjectRx.ulFlags = MSG_OBJ_USE_ID_FILTER;
+CANMessageSet(CAN0_BASE, 4, &sMsgObjectRx, MSG_OBJ_TYPE_RX);
+//
+// Configure and start transmit of message object.
+//
+sMsgObjectTx.ulMsgID = 0x400;
+sMsgObjectTx.ulFlags = 0;
+sMsgObjectTx.ulMsgLen = 8;
+sMsgObjectTx.pucMsgData = ucBufferOut;
+CANMessageSet(CAN0_BASE, 2, &sMsgObjectTx, MSG_OBJ_TYPE_TX);
+//
+// Wait for new data to become available.
+//
+while((CANStatusGet(CAN1_BASE, CAN_STS_NEWDAT) & 1) == 0)
+{
+//
+// Read the message out of the message object.
+//
+CANMessageGet(CAN1_BASE, 1, &sMsgObjectRx, true);
+}
+//
+// Process new data in sMsgObjectRx.pucMsgData.
+//
+...
+
+
+}*/

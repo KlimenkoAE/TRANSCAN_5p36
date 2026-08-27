@@ -2046,6 +2046,7 @@ struct tCANMsgObject
     uint32_t ulMsgIDMask;
     uint32_t ulFlags;
     uint32_t ulMsgLen;
+    uint8_t* pucMsgData;
 };
 
 struct tCANBitClkParms
@@ -2054,4 +2055,31 @@ struct tCANBitClkParms
     uint32_t ulPhase2Seg;
     uint32_t ulSJW;
     uint32_t ulQuantumPrescaler;
+};
+
+// ============================================================
+// CAN enums
+// ============================================================
+
+enum class tCANIntStsReg
+{
+    CAN_INT_STS_CAUSE,
+    CAN_INT_STS_OBJECT,
+};
+
+enum class tCANStsReg
+{
+    CAN_STS_CONTROL,
+    CAN_STS_TXREQUEST,
+    CAN_STS_NEWDAT,
+    CAN_STS_MSGVAL,
+};
+
+enum class tMsgObjType
+{
+    MSG_OBJ_TYPE_TX,
+    MSG_OBJ_TYPE_TX_REMOTE,
+    MSG_OBJ_TYPE_RX,
+    MSG_OBJ_TYPE_RX_REMOTE,
+    MSG_OBJ_TYPE_RXTX_REMOTE,
 };

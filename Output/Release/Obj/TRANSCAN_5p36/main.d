@@ -471,6 +471,9 @@ Output/Release/Obj/TRANSCAN_5p36/main.o: \
   ../StellarisWare/driverlib/rom_map.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_CLASSES.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/concepts \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__concepts/common_with.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
@@ -478,6 +481,7 @@ Output/Release/Obj/TRANSCAN_5p36/main.o: \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_THIS_PROGRAM_DEFS.hpp \
   ../StellarisWare/driverlib/rom.h \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \

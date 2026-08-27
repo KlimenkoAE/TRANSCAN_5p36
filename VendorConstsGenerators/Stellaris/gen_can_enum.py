@@ -28,39 +28,12 @@ dst = (
 
 
 # ============================================================
-# Type conversion
-# ============================================================
-
-TYPE_MAP = {
-    "unsigned long": "uint32_t",
-    "unsigned int": "uint32_t",
-    "unsigned short": "uint16_t",
-    "unsigned char": "uint8_t",
-    "unsigned char *": "uint8_t*",
-    "char *": "char*",
-    "void *": "void*",
-}
-
-
-def normalize_type(type_name: str, pointer: bool = False) -> str:
-    type_name = re.sub(r"\s+", " ", type_name.strip())
-
-    if pointer:
-        type_name += " *"
-
-    if type_name in TYPE_MAP:
-        return TYPE_MAP[type_name]
-
-    raise ValueError(f"Unknown type: {type_name}")
-
-
-# ============================================================
 # Regular expressions
 # ============================================================
 
-STRUCT_RE = re.compile(
+ENUM_RE = re.compile(
     r"""
-    typedef\s+struct
+    typedef\s+enum
     \s*\{
         (?P<body>.*?)
     \}
@@ -71,29 +44,21 @@ STRUCT_RE = re.compile(
 )
 
 
-FIELD_RE = re.compile(
+ENUM_ITEM_RE = re.compile(
     r"""
-    ^\s*
-    (?P<type>
-        unsigned\s+char
-        |
-        unsigned\s+short
-        |
-        unsigned\s+int
-        |
-        unsigned\s+long
-        |
-        char
-        |
-        void
-    )
-    \s*
-    (?P<pointer>\*)?
-    \s*
     (?P<name>[A-Za-z_]\w*)
-    \s*;
+    \s*
+    (?:
+        =
+        \s*
+        (?P<value>
+            [^,\n]+
+        )
+    )?
+    \s*
+    (?=,|$)
     """,
-    re.M | re.X,
+    re.X,
 )
 
 
@@ -101,59 +66,107 @@ FIELD_RE = re.compile(
 # Parsing
 # ============================================================
 
-def parse_structs(text: str):
+def parse_enums(text: str):
+
     result = []
 
-    for match in STRUCT_RE.finditer(text):
+    for match in ENUM_RE.finditer(text):
 
         body = match.group("body")
         name = match.group("name")
 
-        fields = []
+        items = []
 
-        for field in FIELD_RE.finditer(body):
+        # Убираем C/C++ комментарии.
+        body = re.sub(
+            r"/\*.*?\*/",
+            "",
+            body,
+            flags=re.S
+        )
 
-            field_type = normalize_type(
-                field.group("type"),
-                field.group("pointer") is not None
-            )
+        body = re.sub(
+            r"//.*",
+            "",
+            body
+        )
 
-            field_name = field.group("name")
+        for item in body.split(","):
 
-            fields.append(
-                (field_type, field_name)
-            )
+            item = item.strip()
 
-        if fields:
+            if not item:
+                continue
+
+            if "=" in item:
+
+                item_name, value = item.split(
+                    "=",
+                    1
+                )
+
+                item_name = item_name.strip()
+                value = value.strip()
+
+                if not re.match(
+                    r"^[A-Za-z_]\w*$",
+                    item_name
+                ):
+                    continue
+
+                items.append(
+                    (item_name, value)
+                )
+
+            else:
+
+                if not re.match(
+                    r"^[A-Za-z_]\w*$",
+                    item
+                ):
+                    continue
+
+                items.append(
+                    (item, None)
+                )
+
+        if items:
             result.append(
-                (name, fields)
+                (name, items)
             )
 
     return result
+
 
 # ============================================================
 # Code generation
 # ============================================================
 
-def generate(structs):
+def generate(enums):
 
     out = []
 
     out.append("")
     out.append("// ============================================================")
-    out.append("// CAN structures")
+    out.append("// CAN enums")
     out.append("// ============================================================")
     out.append("")
 
-    for name, fields in structs:
+    for name, items in enums:
 
-        out.append(f"struct {name}")
+        out.append(f"enum class {name}")
         out.append("{")
 
-        for field_type, field_name in fields:
-            out.append(
-                f"    {field_type} {field_name};"
-            )
+        for item_name, value in items:
+
+            if value is None:
+                out.append(
+                    f"    {item_name},"
+                )
+            else:
+                out.append(
+                    f"    {item_name} = {value},"
+                )
 
         out.append("};")
         out.append("")
@@ -178,11 +191,11 @@ def main():
         encoding="utf-8"
     )
 
-    structs = parse_structs(text)
+    enums = parse_enums(text)
 
-    if not structs:
+    if not enums:
         print(
-            f"No CAN structs found in {src}",
+            f"No CAN enums found in {src}",
             file=sys.stderr
         )
         return 3
@@ -194,22 +207,13 @@ def main():
         )
         return 4
 
-    generated = generate(structs)
+    generated = generate(enums)
 
     with dst.open(
         "a",
         encoding="utf-8"
     ) as f:
         f.write(generated)
-
- #   print(
- #       f"Appended CAN structs to {dst}"
- #   )
-
- #   for name, fields in structs:
- #       print(
- #           f"  {name}: {len(fields)} fields"
-  #      )
 
     return 0
 

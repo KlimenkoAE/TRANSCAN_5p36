@@ -24,6 +24,7 @@ generators = {
         "gen_sysctl.py",
 	"gen_can_defs.py",
         "gen_can_struct.py",
+        "gen_can_enum.py",
 
     ],
 

@@ -469,17 +469,24 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   ../StellarisWare/driverlib/interrupt.h \
   ../StellarisWare/driverlib/usb.h ../StellarisWare/inc/hw_usb.h \
   ../StellarisWare/driverlib/rom_map.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
-  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
-  ../StellarisWare/driverlib/rom.h \
-  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MemPull.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/type_traits \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/add_cv.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/add_volatile.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/aligned_union.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/alignment_of.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/has_virtual_destructor.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_abstract.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_compound.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_fundamental.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_literal_type.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_pod.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_polymorphic.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/rank.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/result_of.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/has_unique_object_representation.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_aggregate.h \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__type_traits/is_nothrow_convertible.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/bit \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_ceil.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/bit_floor.h \
@@ -488,6 +495,21 @@ Output/Debug/Obj/TRANSCAN_5p36/main.o: \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/endian.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/has_single_bit.h \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__bit/byteswap.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CLASSES.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/MyTuples.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_CLASSES.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/concepts \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__concepts/common_with.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VENDOR_CONSTANT_WRAP.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/StellarisDefinition.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/VendorFunctionsWrap.hpp \
+  /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/cstdarg \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/BackEnd.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_THIS_PROGRAM_DEFS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/USB_CONSTS.hpp \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/CAN_THIS_PROGRAM_DEFS.hpp \
+  ../StellarisWare/driverlib/rom.h \
+  /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/periferalInterruptsHandlers.hpp \
   /home/Andrew/Documents/SEGGER\ Embedded\ Studio\ Projects/TRANSCAN_5p36/_TIMERS.hpp \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/algorithm \
   /opt/SEGGER/segger_embedded_studio_8.28a/source/libcxx/include/__algorithm/adjacent_find.h \
