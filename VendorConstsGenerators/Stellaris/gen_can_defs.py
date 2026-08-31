@@ -25,11 +25,15 @@ dst = (
     Path(__file__).resolve().parent.parent.parent
     / "StellarisDefinition.hpp"
 )
+
+
 def fix_enum_name(name: str) -> str:
-    # если имя начинается с цифры — добавляем префикс T
+    # если имя начинается с цифры — добавляем префикс C
     if name[0].isdigit():
         return "C" + name
+
     return name
+
 
 # ============================================================
 # Read source
@@ -70,9 +74,9 @@ if match:
 
 
 # ============================================================
-# Read numeric #define
+# Read #define
 #
-# Order is preserved exactly as in timer.h
+# Order is preserved exactly as in can.h
 # ============================================================
 
 defines = []
@@ -81,15 +85,71 @@ pattern = re.compile(
     r'^\s*#define\s+'
     r'([A-Za-z0-9_]+)'
     r'\s+'
-    r'(0x[0-9A-Fa-f]+|[0-9]+)'
+    r'(\(?)'
+    r'(0?x?)'
+    r'([0-9A-Za-z|\s_]+\)?)'
     r'(?:\s|$)',
     re.MULTILINE
 )
 
-for name, value in pattern.findall(text):
-    defines.append((name, value))
+for name, pref1, pref2, value in pattern.findall(text):
+    defines.append((name, pref1, pref2, value))
 
 
+# ============================================================
+# Define map
+#
+# Used for expanding references such as:
+#
+# MSG_OBJ_STATUS_MASK
+#     -> (MSG_OBJ_NEW_DATA | MSG_OBJ_DATA_LOST)
+#     -> (0x00000080 | 0x00000100)
+#
+# ============================================================
+
+define_map = {
+    name: f"{pref1}{pref2}{value}".strip()
+    for name, pref1, pref2, value in defines
+}
+
+
+def expand_macros(value: str, seen=None) -> str:
+    """
+    Recursively expand #define references.
+
+    Example:
+
+        (MSG_OBJ_NEW_DATA | MSG_OBJ_DATA_LOST)
+
+    becomes:
+
+        (0x00000080 | 0x00000100)
+    """
+
+    if seen is None:
+        seen = set()
+
+    def replace(match):
+        name = match.group(0)
+
+        # Это не наш #define — оставляем как есть.
+        if name not in define_map:
+            return name
+
+        # Защита от циклических define.
+        if name in seen:
+            return name
+
+        return expand_macros(
+            define_map[name],
+            seen | {name}
+        )
+
+    return re.sub(
+        r'\b[A-Za-z_][A-Za-z0-9_]*\b',
+        replace,
+        value
+    )
 
 
 # ============================================================
@@ -97,17 +157,18 @@ for name, value in pattern.findall(text):
 # ============================================================
 
 msg = [
-    (name, value)
-    for name, value in defines
+    (name, pref1, pref2, value)
+    for name, pref1, pref2, value in defines
     if name.startswith("MSG_")
 ]
 
 
 can = [
-    (name, value)
-    for name, value in defines
+    (name, pref1, pref2, value)
+    for name, pref1, pref2, value in defines
     if name.startswith("CAN_")
 ]
+
 
 # ============================================================
 # Diagnostics
@@ -119,10 +180,9 @@ print(
 )
 
 print(
-    f"CAN definitions   : {len(can)}",
+    f"CAN definitions     : {len(can)}",
     file=sys.stderr
 )
-
 
 
 # ============================================================
@@ -148,7 +208,7 @@ with open(
 
 
     # ========================================================
-    # Timer
+    # MSG
     # ========================================================
 
     if msg:
@@ -159,11 +219,10 @@ with open(
 
         f.write("{\n")
 
-        for name, value in msg:
+        for name, pref1, pref2, value in msg:
 
             member = name[len("MSG_"):]
-        #    if member == "DEBUG":
-        #        member = "DBG"
+
             f.write(
                 f"    {fix_enum_name(member)},\n"
             )
@@ -184,10 +243,16 @@ with open(
 
         f.write("    {\n")
 
-        for name, value in msg:
+        for name, pref1, pref2, value in msg:
+
+            original_value = f"{pref1}{pref2}{value}".strip()
+
+            expanded = expand_macros(
+                original_value
+            )
 
             f.write(
-                f"        {value},\n"
+                f"        {expanded},//{name}\n"
             )
 
         f.write("    };\n")
@@ -202,13 +267,10 @@ with open(
 
 
     # ========================================================
-    # Interrupts
+    # CAN
     #
-    # IMPORTANT:
-    # We do not split INT_* by peripheral here.
-    # The generated layer only mirrors hw_ints.h.
-    # Semantic mapping is done manually in
-    # StellarisDefinitionView.hpp.
+    # We do not split CAN_* by peripheral here.
+    # The generated layer only mirrors can.h.
     # ========================================================
 
     if can:
@@ -219,7 +281,7 @@ with open(
 
         f.write("{\n")
 
-        for name, value in can:
+        for name, pref1, pref2, value in can:
 
             member = name[len("CAN_"):]
 
@@ -243,10 +305,16 @@ with open(
 
         f.write("    {\n")
 
-        for name, value in can:
+        for name, pref1, pref2, value in can:
+
+            original_value = f"{pref1}{pref2}{value}".strip()
+
+            expanded = expand_macros(
+                original_value
+            )
 
             f.write(
-                f"        {value},\n"
+                f"        {expanded},//{name}\n"
             )
 
         f.write("    };\n")
@@ -258,4 +326,3 @@ with open(
         )
 
         f.write("}\n\n")
-
